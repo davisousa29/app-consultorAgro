@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app-consultorAgro",
-    "slug": "app-consultorAgro",
+    "name": "AgroSystem Consultor",
+    "slug": "agrosystem-consultor",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.agrosystem.consultor"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,10 +22,18 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.agrosystem.consultor"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "scheme": "agrosystem-consultor",
+    "extra": {
+      "apiUrl": "http://localhost/api"
     }
   }
 }
