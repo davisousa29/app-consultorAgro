@@ -6,7 +6,6 @@ import {
     TouchableOpacity,
     TextInput,
     ActivityIndicator,
-    Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -15,9 +14,11 @@ import { router } from 'expo-router'
 import { register } from '../../src/services/authService'
 import { useAuthStore } from '../../src/store/authStore'
 import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
-import Logo from '../../src/components/Logo'
-import BackHeader from '../../src/components/Header/BackHeader'
 import { globalStyles } from '../../src/constants/globalStyles'
+import BackHeader from '../../src/components/Header/BackHeader'
+import MaskedInput from '../../src/components/Input/MaskedInput'
+import { phoneMask } from '../../src/utils/masks'
+import CentralModal from '../../src/components/Modal/CentralModal'
 
 export default function Register() {
     const { setUser } = useAuthStore()
@@ -30,15 +31,32 @@ export default function Register() {
     const [password, setPassword] = useState('')
     const [passwordConfirmation, setPasswordConfirmation] = useState('')
     const [loading, setLoading] = useState(false)
+    const [isSuccess, setIsSuccess] = useState(false)
+    const [modal, setModal] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        type: 'default' as 'default' | 'success' | 'error',
+    })
 
     async function handleRegister() {
         if (!name || !email || !username || !password || !passwordConfirmation) {
-            Alert.alert('Atenção', 'Preencha todos os campos obrigatórios.')
+            setModal({
+                visible: true,
+                title: 'Atenção',
+                message: 'Preencha todos os campos obrigatórios.',
+                type: 'default',
+            })
             return
         }
 
         if (password !== passwordConfirmation) {
-            Alert.alert('Atenção', 'As senhas não coincidem.')
+            setModal({
+                visible: true,
+                title: 'Atenção',
+                message: 'As senhas não coincidem.',
+                type: 'default',
+            })
             return
         }
 
@@ -54,14 +72,33 @@ export default function Register() {
                 password_confirmation: passwordConfirmation,
             })
             setUser(response.user, response.token)
-            router.replace('/consultor/home')
+            setIsSuccess(true)
+
+            setModal({
+                visible: true,
+                title: 'Sucesso',
+                message: 'Conta criada com sucesso!',
+                type: 'success',
+            })
         } catch (error: any) {
             const errors = error.response?.data?.errors
+
             if (errors) {
                 const firstError = Object.values(errors)[0] as string[]
-                Alert.alert('Erro', firstError[0])
+
+                setModal({
+                    visible: true,
+                    title: 'Erro',
+                    message: firstError[0],
+                    type: 'error',
+                })
             } else {
-                Alert.alert('Erro', error.response?.data?.message || 'Erro ao criar conta.')
+                setModal({
+                    visible: true,
+                    title: 'Erro',
+                    message: error.response?.data?.message || 'Erro ao criar conta.',
+                    type: 'error',
+                })
             }
         } finally {
             setLoading(false)
@@ -130,29 +167,23 @@ export default function Register() {
                         <Text style={globalStyles.inputHint}>Usado para que fazendeiros te encontrem</Text>
                     </View>
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Telefone</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="(62) 99999-9999"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={phone}
-                            onChangeText={setPhone}
-                            keyboardType="phone-pad"
-                        />
-                    </View>
+                    <MaskedInput
+                        label="Telefone"
+                        value={phone}
+                        onChange={setPhone}
+                        placeholder="(62) 99999-9999"
+                        keyboardType="phone-pad"
+                        mask={phoneMask}
+                    />
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>WhatsApp</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="(62) 99999-9999"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={whatsapp}
-                            onChangeText={setWhatsapp}
-                            keyboardType="phone-pad"
-                        />
-                    </View>
+                    <MaskedInput
+                        label="WhatsApp"
+                        value={whatsapp}
+                        onChange={setWhatsapp}
+                        placeholder="(62) 99999-9999"
+                        keyboardType="phone-pad"
+                        mask={phoneMask}
+                    />
 
                     <View style={globalStyles.inputGroup}>
                         <Text style={globalStyles.inputLabel}>Senha *</Text>
@@ -204,30 +235,26 @@ export default function Register() {
                 </View>
 
             </ScrollView>
+
+            <CentralModal
+                visible={modal.visible}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+                onClose={() => {
+                    setModal(prev => ({ ...prev, visible: false }))
+
+                    if (isSuccess) {
+                        setIsSuccess(false)
+                        router.replace('/consultor/perfil')
+                    }
+                }}
+            />
         </KeyboardAvoidingView>
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: Colors.background,
-    },
-    header: {
-        alignItems: 'center',
-        marginBottom: Spacing.xl,
-    },
-    title: {
-        fontSize: FontSize.xxl,
-        fontWeight: 'bold',
-        color: Colors.black,
-        marginTop: Spacing.md,
-        marginBottom: Spacing.xs,
-    },
-    subtitle: {
-        fontSize: FontSize.md,
-        color: Colors.gray[600],
-    },
     form: {
         gap: Spacing.md,
     },
