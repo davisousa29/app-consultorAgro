@@ -25,6 +25,8 @@ export interface ConsultorProfile {
     updated_at: string
 }
 
+export type Profile = ConsultorProfile
+
 // ── Fazenda ───────────────────────────────────────────────────────────────────
 export interface Fazenda {
     id: string

@@ -97,8 +97,7 @@ export default function Perfil() {
     useEffect(() => {
         if (!estado) return
 
-        setCidade('')
-        setCidadeValida(false)
+        const cidadeAtual = cidade  // salva antes de resetar
         setCidadesFiltradas([])
 
         async function fetchCidades() {
@@ -108,7 +107,17 @@ export default function Perfil() {
                     `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${estado}/municipios`
                 )
                 const data = await response.json()
-                setCidades(data.map((item: any) => item.nome))
+                const nomes = data.map((item: any) => item.nome)
+                setCidades(nomes)
+
+                // se tinha cidade salva, verifica se é válida e restaura
+                if (cidadeAtual && nomes.includes(cidadeAtual)) {
+                    setCidade(cidadeAtual)
+                    setCidadeValida(true)
+                } else {
+                    setCidade('')
+                    setCidadeValida(false)
+                }
             } catch {
                 Alert.alert('Aviso', 'Não foi possível carregar as cidades.')
             } finally {
@@ -134,16 +143,6 @@ export default function Perfil() {
 
     // ── Salva o perfil ─────────────────────────────────────────────────────────
     async function handleSalvar() {
-        if (!especializacao || !estado || !cidade) {
-            setModal({
-                visible: true,
-                title: 'Atenção',
-                message: 'Preencha especialização, estado e cidade.',
-                type: 'default',
-            })
-            return
-        }
-
         if (especializacao === 'Outro' && !especializacaoCustom.trim()) {
             setModal({
                 visible: true,
@@ -178,19 +177,12 @@ export default function Perfil() {
                 location_city: cidade,
             })
 
-            // 👇 MOSTRA MODAL DE SUCESSO
             setModal({
                 visible: true,
                 title: 'Sucesso',
                 message: 'Perfil salvo com sucesso!',
                 type: 'success',
             })
-
-            // 👇 AGUARDA E REDIRECIONA
-            setTimeout(() => {
-                router.replace('/consultor/home')
-            }, 2000) // 2 segundos (pode ajustar)
-
         } catch (error: any) {
             const errors = error.response?.data?.errors
 
@@ -355,6 +347,7 @@ export default function Perfil() {
                             <TextInput
                                 style={[
                                     globalStyles.input,
+                                    { flex: 1 },
                                     cidadeValida && styles.inputValido,
                                 ]}
                                 placeholder={
@@ -375,7 +368,9 @@ export default function Perfil() {
                             />
 
                             {cidadeValida && (
-                                <Text style={styles.validIcon}>✓</Text>
+                                <View style={styles.validIconContainer}>
+                                    <Text style={styles.validIcon}>✓</Text>
+                                </View>
                             )}
                         </View>
 
@@ -518,17 +513,24 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     cidadeContainer: {
-        position: 'relative',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.sm,
     },
     inputValido: {
         borderColor: Colors.success,
     },
+    validIconContainer: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: Colors.success,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     validIcon: {
-        position: 'absolute',
-        right: Spacing.md,
-        top: '50%',
-        color: Colors.success,
-        fontSize: FontSize.lg,
+        color: Colors.white,
+        fontSize: FontSize.md,
         fontWeight: 'bold',
     },
     cidadeInvalida: {

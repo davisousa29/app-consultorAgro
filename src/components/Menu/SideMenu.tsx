@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react'
 import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { Colors, Spacing, FontSize } from '../../constants'
+import { Icons } from '../../constants/icons'
 import { useAuthStore } from '../../store/authStore'
 import { logout } from '../../services/authService'
 
@@ -77,10 +78,10 @@ export default function SideMenu({ visible, onClose }: Props) {
     }
 
     const menuItems = [
-        { icon: '🏠', label: 'Home', path: '/consultor/home' },
-        { icon: '👤', label: 'Meu perfil', path: '/consultor/perfil' },
-        { icon: '🤝', label: 'Contratos', path: '/consultor/contratos' },
-        { icon: '🔍', label: 'Buscar fazendeiros', path: '/consultor/busca' },
+        { icon: <Icons.home size={20} color={Colors.black}/> , label: 'Home', path: '/consultor/home' },
+        { icon: <Icons.user size={20} color={Colors.black} />, label: 'Meu perfil', path: '/consultor/perfil' },
+        { icon: <Icons.contract size={20} color={Colors.black} />, label: 'Contratos', path: '/consultor/contratos' },
+        { icon: <Icons.search size={20} color={Colors.black} />, label: 'Buscar fazendeiros', path: '/consultor/busca' },
     ]
 
     return (
@@ -142,7 +143,7 @@ export default function SideMenu({ visible, onClose }: Props) {
                         onPress={handleLogout}
                         activeOpacity={0.7}
                     >
-                        <Text style={styles.logoutIcon}>🚪</Text>
+                        <Icons.logout size={20} color={Colors.red}/>
                         <Text style={styles.logoutLabel}>Sair</Text>
                     </TouchableOpacity>
                 </Animated.View>

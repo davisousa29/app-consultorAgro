@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
+import { Icons } from '../../constants/icons'
 import { globalStyles } from '../../constants/globalStyles'
 import ProfileDropdown from './ProfileDropdown'
 import SideMenu from '../Menu/SideMenu'
@@ -20,23 +21,28 @@ export default function AppHeader() {
                         style={styles.menuButton}
                         onPress={() => setMenuVisible(true)}
                     >
-                        <Text style={styles.icon}>☰</Text>
+                        <Icons.menu size={20} color={Colors.primary} />
                     </TouchableOpacity>
 
-                    <Text style={styles.title}>AgroSystem</Text>
+                    <TouchableOpacity
+                        onPress={() => router.replace('/consultor/home')}
+                    >
+                        <Text style={styles.title}>AgroSystem</Text>
+                    </TouchableOpacity>
+
                 </View>
 
                 {/* DIREITA */}
                 <View style={styles.right}>
                     <TouchableOpacity style={styles.iconButton}>
-                        <Text style={styles.icon}>🔔</Text>
+                        <Icons.bell size={20} color={Colors.primary} />
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         style={styles.profileButton}
                         onPress={() => setDropdownVisible(!dropdownVisible)}
                     >
-                        <Text style={styles.icon}>👤</Text>
+                        <Icons.user size={20} color={Colors.primary} />
                     </TouchableOpacity>
                 </View>
 

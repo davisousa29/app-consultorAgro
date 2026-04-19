@@ -7,6 +7,7 @@ import {
 } from 'react-native'
 import { router } from 'expo-router'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
+import { Icons } from '../../constants/icons'
 import { useAuthStore } from '../../store/authStore'
 import { logout } from '../../services/authService'
 
@@ -55,7 +56,7 @@ export default function ProfileDropdown({ visible, onClose }: Props) {
                         onPress={() => handleNavigate('/consultor/perfil')}
                         activeOpacity={0.7}
                     >
-                        <Text style={styles.itemIcon}>👤</Text>
+                        <Icons.user size={20} color={Colors.black} />
                         <Text style={styles.itemLabel}>Meu perfil</Text>
                     </TouchableOpacity>
 
@@ -66,7 +67,7 @@ export default function ProfileDropdown({ visible, onClose }: Props) {
                         onPress={handleLogout}
                         activeOpacity={0.7}
                     >
-                        <Text style={styles.itemIcon}>🚪</Text>
+                        <Icons.logout size={20} color={Colors.red}/>
                         <Text style={[styles.itemLabel, styles.logoutText]}>Sair</Text>
                     </TouchableOpacity>
                 </TouchableOpacity>

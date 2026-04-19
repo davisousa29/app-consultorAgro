@@ -17,6 +17,7 @@ export const Colors = {
         800: '#343A40',
         900: '#212529',
     },
+    red: '#FA5252',
     success: '#40C057',
     warning: '#FAB005',
     error: '#FA5252',
