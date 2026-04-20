@@ -18,27 +18,10 @@ import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
 import api from '../../src/services/api'
 import CentralModal from '../../src/components/Modal/CentralModal'
 import BackHeader from "../../src/components/Header/BackHeader";
-
-const ESPECIALIZACOES = [
-    'Bovinos de corte',
-    'Bovinos de leite',
-    'Suínos',
-    'Aves',
-    'Ovinos e caprinos',
-    'Equinos',
-    'Aquicultura',
-    'Geral',
-    'Outro',
-]
-
-const ESTADOS = [
-    'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA',
-    'MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN',
-    'RS','RO','RR','SC','SP','SE','TO',
-]
+import { ESPECIALIZACOES, ESTADOS } from '../../src/constants/options'
 
 export default function Perfil() {
-    const { user } = useAuthStore()
+    const { user, setProfile } = useAuthStore()
 
     const [crea, setCrea] = useState('')
     const [especializacao, setEspecializacao] = useState('')
@@ -84,8 +67,19 @@ export default function Perfil() {
                         setEspecializacaoCustom(spec)
                     }
                 }
-            } catch {
-                // perfil ainda não existe — tudo bem, campos ficam vazios
+            } catch (error: any) {
+                const errors = error.response?.data?.errors
+
+                if (errors) {
+                    const firstError = Object.values(errors)[0] as string[]
+
+                    setModal({
+                        visible: true,
+                        title: 'Erro',
+                        message: firstError[0],
+                        type: 'error',
+                    })
+                }
             } finally {
                 setLoadingPerfil(false)
             }
@@ -98,7 +92,7 @@ export default function Perfil() {
     useEffect(() => {
         if (!estado) return
 
-        const cidadeAtual = cidade  // salva antes de resetar
+        const cidadeAtual = cidade
         setCidadesFiltradas([])
 
         async function fetchCidades() {
@@ -111,7 +105,6 @@ export default function Perfil() {
                 const nomes = data.map((item: any) => item.nome)
                 setCidades(nomes)
 
-                // se tinha cidade salva, verifica se é válida e restaura
                 if (cidadeAtual && nomes.includes(cidadeAtual)) {
                     setCidade(cidadeAtual)
                     setCidadeValida(true)
@@ -120,6 +113,12 @@ export default function Perfil() {
                     setCidadeValida(false)
                 }
             } catch {
+                setModal({
+                    visible: true,
+                    title: 'Aviso',
+                    message: 'Não foi possível carregar as cidades.',
+                    type: 'error',
+                })
                 Alert.alert('Aviso', 'Não foi possível carregar as cidades.')
             } finally {
                 setLoadingCidades(false)
@@ -178,6 +177,21 @@ export default function Perfil() {
                 location_city: cidade,
             })
 
+            const response = await api.post('/perfil', {
+                crea_number: crea,
+                specialization:
+                    especializacao === 'Outro'
+                        ? especializacaoCustom
+                        : especializacao,
+                bio,
+                location_state: estado,
+                location_city: cidade,
+            })
+
+            setProfile(response.data.perfil)
+
+            setIsSuccess(true)
+
             setModal({
                 visible: true,
                 title: 'Sucesso',
@@ -231,8 +245,12 @@ export default function Perfil() {
             >
 
                 <BackHeader
-                    title={<Text style={styles.step}>Quase lá!</Text>}
-                    effectPhrase={<Text style={styles.title}>Complete seu perfil</Text>}
+                    title={
+                        <Text style={styles.step}>Quase lá!</Text>
+                    }
+                    effectPhrase={
+                        <Text style={styles.title}>Complete seu perfil</Text>
+                    }
                     subtitle={
                         <Text style={styles.subtitle}>
                             Essas informações ajudam os fazendeiros a te encontrarem
@@ -443,11 +461,6 @@ export default function Perfil() {
                 type={modal.type}
                 onClose={() => {
                     setModal(prev => ({ ...prev, visible: false }))
-
-                    if (isSuccess) {
-                        setIsSuccess(false)
-                        router.replace('/consultor/perfil')
-                    }
                 }}
             />
         </KeyboardAvoidingView>
@@ -479,6 +492,7 @@ const styles = StyleSheet.create({
         fontSize: FontSize.md,
         color: Colors.gray[600],
         lineHeight: 22,
+        textAlign: "center",
     },
     form: {
         gap: Spacing.lg,
