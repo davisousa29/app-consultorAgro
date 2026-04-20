@@ -17,6 +17,7 @@ import { globalStyles } from '../../src/constants/globalStyles'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
 import api from '../../src/services/api'
 import CentralModal from '../../src/components/Modal/CentralModal'
+import BackHeader from "../../src/components/Header/BackHeader";
 
 const ESPECIALIZACOES = [
     'Bovinos de corte',
@@ -224,18 +225,21 @@ export default function Perfil() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <ScrollView
-                contentContainerStyle={[globalStyles.scrollContent, styles.scroll]}
+                contentContainerStyle={globalStyles.scrollContent}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             >
-                {/* Cabeçalho */}
-                <View style={styles.header}>
-                    <Text style={styles.step}>Quase lá!</Text>
-                    <Text style={styles.title}>Complete seu perfil</Text>
-                    <Text style={styles.subtitle}>
-                        Essas informações ajudam os fazendeiros a te encontrarem
-                    </Text>
-                </View>
+
+                <BackHeader
+                    title={<Text style={styles.step}>Quase lá!</Text>}
+                    effectPhrase={<Text style={styles.title}>Complete seu perfil</Text>}
+                    subtitle={
+                        <Text style={styles.subtitle}>
+                            Essas informações ajudam os fazendeiros a te encontrarem
+                        </Text>
+                    }
+                    showLogo={false}
+                />
 
                 <View style={styles.form}>
 

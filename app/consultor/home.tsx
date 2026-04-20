@@ -1,8 +1,11 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { useEffect } from 'react'
+import { router } from 'expo-router'
 import { useAuthStore } from '../../src/store/authStore'
 import api from '../../src/services/api'
 import { Colors, FontSize, Spacing } from '../../src/constants'
+import { menuItems } from '../../src/constants/menuItems'
+import QuickShortcuts from '../../src/components/QuickShortcuts/QuickShortcuts'
 
 export default function Home() {
 
@@ -22,11 +25,6 @@ export default function Home() {
             loadProfile()
         }
     }, [user])
-
-    // useEffect(() => {
-    //     console.log('USER =>', user)
-    //     console.log('PROFILE =>', profile)
-    // }, [user, profile])
 
     return (
         <View style={styles.container}>
@@ -54,19 +52,7 @@ export default function Home() {
 
             </View>
 
-            <View style={styles.cardQuickShortcuts}>
-                <Text style={styles.title}>Menus rápidos</Text>
-
-                <View style={styles.subCardQuickShortcuts}>
-                    <TouchableOpacity style={styles.ItemShortcuts}>
-
-                    </TouchableOpacity>
-
-                    <TouchableOpacity style={styles.ItemShortcuts}>
-
-                    </TouchableOpacity>
-                </View>
-            </View>
+            <QuickShortcuts />
         </View>
     )
 }
@@ -96,14 +82,24 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         justifyContent: "space-between",
+        flexDirection: "row",
         gap: 5,
     },
 
     ItemShortcuts: {
-        width: '50%',
-        height: 50,
-        borderRadius: 10,
+        width: '48%',
+        height: 80,
+        borderRadius: 12,
         backgroundColor: Colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 6,
+    },
+
+    shortcutText: {
+        color: Colors.white,
+        fontSize: 12,
+        textAlign: 'center',
     },
 
     image: {

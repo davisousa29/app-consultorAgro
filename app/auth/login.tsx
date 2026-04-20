@@ -66,12 +66,13 @@ export default function Login() {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <ScrollView
-                contentContainerStyle={globalStyles.scrollContent}
+                contentContainerStyle={globalStyles.scrollContentLoggedOut}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             >
                 <BackHeader
                     title="Criar conta"
+                    effectPhrase={''}
                     subtitle="Preencha seus dados para começar"
                     showLogo={true}
                 />

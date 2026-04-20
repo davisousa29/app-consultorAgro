@@ -15,6 +15,7 @@ import { Colors, Spacing, FontSize } from '../../constants'
 import { Icons } from '../../constants/icons'
 import { useAuthStore } from '../../store/authStore'
 import { logout } from '../../services/authService'
+import { menuItems } from '../../constants/menuItems'
 
 const MENU_WIDTH = Dimensions.get('window').width * 0.75
 
@@ -77,13 +78,6 @@ export default function SideMenu({ visible, onClose }: Props) {
         router.push(path as any)
     }
 
-    const menuItems = [
-        { icon: <Icons.home size={20} color={Colors.black}/> , label: 'Home', path: '/consultor/home' },
-        { icon: <Icons.user size={20} color={Colors.black} />, label: 'Meu perfil', path: '/consultor/perfil' },
-        { icon: <Icons.contract size={20} color={Colors.black} />, label: 'Contratos', path: '/consultor/contratos' },
-        { icon: <Icons.search size={20} color={Colors.black} />, label: 'Buscar fazendeiros', path: '/consultor/busca' },
-    ]
-
     return (
         <Modal
             visible={modalVisible}
@@ -123,17 +117,21 @@ export default function SideMenu({ visible, onClose }: Props) {
                     <View style={styles.divider} />
 
                     <View style={styles.navItems}>
-                        {menuItems.map((item) => (
-                            <TouchableOpacity
-                                key={item.path}
-                                style={styles.navItem}
-                                onPress={() => handleNavigate(item.path)}
-                                activeOpacity={0.7}
-                            >
-                                <Text style={styles.navIcon}>{item.icon}</Text>
-                                <Text style={styles.navLabel}>{item.label}</Text>
-                            </TouchableOpacity>
-                        ))}
+                        {menuItems.map((item) => {
+                            const Icon = item.icon
+
+                            return (
+                                <TouchableOpacity
+                                    key={item.path}
+                                    style={styles.navItem}
+                                    onPress={() => handleNavigate(item.path)}
+                                    activeOpacity={0.7}
+                                >
+                                    <Icon size={20} color={Colors.black} />
+                                    <Text style={styles.navLabel}>{item.label}</Text>
+                                </TouchableOpacity>
+                            )
+                        })}
                     </View>
 
                     <View style={styles.divider} />
