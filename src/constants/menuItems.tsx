@@ -21,4 +21,14 @@ export const menuItems = [
         label: 'Buscar fazendeiros',
         path: '/consultor/busca',
     },
+    {
+        icon: Icons.supplementation,
+        label: 'Suplementação',
+        path: '/consultor/suplementacao'
+    },
+    {
+        icon: Icons.wheat,
+        label: 'Formulação de ração',
+        path: '/consultor/formulacaoRacao'
+    }
 ]

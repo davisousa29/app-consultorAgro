@@ -6,7 +6,9 @@ import {
     Bell,
     Menu,
     ScrollText,
-    Search
+    Search,
+    Wheat,
+    PillBottle,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -18,4 +20,6 @@ export const Icons = {
     menu: Menu,
     contract: ScrollText,
     search: Search,
+    wheat: Wheat,
+    supplementation: PillBottle,
 }
