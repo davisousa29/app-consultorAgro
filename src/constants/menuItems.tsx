@@ -30,5 +30,10 @@ export const menuItems = [
         icon: Icons.wheat,
         label: 'Formulação de ração',
         path: '/consultor/formulacaoRacao'
-    }
+    },
+    {
+        icon: Icons.forragem,
+        label: 'Forragem',
+        path: '/consultor/forragem'
+    },
 ]

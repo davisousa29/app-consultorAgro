@@ -1,37 +1,60 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
-    View,
-    Text,
-    StyleSheet,
-    TouchableOpacity,
-    TextInput,
     ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from 'react-native'
-import { router } from 'expo-router'
-import { register } from '../../src/services/authService'
-import { useAuthStore } from '../../src/store/authStore'
-import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
+
+import * as Location from 'expo-location'
+
+import {
+    Trash2,
+    BrushCleaning,
+} from 'lucide-react-native'
+
+import {
+    buscarClimaAnual,
+    ClimaMensal
+} from '../../src/services/climaService'
+
+import {
+    Colors,
+    Spacing,
+    BorderRadius,
+    FontSize,
+} from '../../src/constants'
+
 import { globalStyles } from '../../src/constants/globalStyles'
-import BackHeader from '../../src/components/Header/BackHeader'
-import MaskedInput from '../../src/components/Input/MaskedInput'
-import { phoneMask } from '../../src/utils/masks'
+
 import CentralModal from '../../src/components/Modal/CentralModal'
 
-export default function Register() {
-    const { setUser } = useAuthStore()
+const meses = [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez',
+]
 
-    const [name, setName] = useState('')
-    const [email, setEmail] = useState('')
-    const [username, setUsername] = useState('')
-    const [phone, setPhone] = useState('')
-    const [whatsapp, setWhatsapp] = useState('')
-    const [password, setPassword] = useState('')
-    const [passwordConfirmation, setPasswordConfirmation] = useState('')
-    const [loading, setLoading] = useState(false)
-    const [isSuccess, setIsSuccess] = useState(false)
+export default function ForragemScreen() {
+
+    const [loading, setLoading] = useState(true)
+
+    const [dados, setDados] = useState<ClimaMensal[]>([])
+
     const [modal, setModal] = useState({
         visible: false,
         title: '',
@@ -39,200 +62,314 @@ export default function Register() {
         type: 'default' as 'default' | 'success' | 'error',
     })
 
-    async function handleRegister() {
-        if (!name || !email || !username || !password || !passwordConfirmation) {
-            setModal({
-                visible: true,
-                title: 'Atenção',
-                message: 'Preencha todos os campos obrigatórios.',
-                type: 'default',
-            })
-            return
-        }
+    async function carregarDados() {
 
-        if (password !== passwordConfirmation) {
-            setModal({
-                visible: true,
-                title: 'Atenção',
-                message: 'As senhas não coincidem.',
-                type: 'default',
-            })
-            return
-        }
-
-        setLoading(true)
         try {
-            const response = await register({
-                name,
-                email,
-                username,
-                phone,
-                whatsapp,
-                password,
-                password_confirmation: passwordConfirmation,
-            })
-            setUser(response.user, response.token)
-            setIsSuccess(true)
+
+            const permission =
+                await Location.requestForegroundPermissionsAsync()
+
+            if (!permission.granted) {
+
+                setModal({
+                    visible: true,
+                    title: 'Permissão necessária',
+                    message: 'Precisamos da sua localização para buscar os dados climáticos.',
+                    type: 'default',
+                })
+
+                return
+            }
+
+            const location =
+                await Location.getCurrentPositionAsync({})
+
+            const clima = await buscarClimaAnual(
+                location.coords.latitude,
+                location.coords.longitude
+            )
+
+            setDados(clima)
+
+        } catch (error) {
+
+            console.log(error)
 
             setModal({
                 visible: true,
-                title: 'Sucesso',
-                message: 'Conta criada com sucesso!',
-                type: 'success',
+                title: 'Erro',
+                message: 'Não foi possível carregar os dados climáticos.',
+                type: 'error',
             })
-        } catch (error: any) {
-            const errors = error.response?.data?.errors
 
-            if (errors) {
-                const firstError = Object.values(errors)[0] as string[]
-
-                setModal({
-                    visible: true,
-                    title: 'Erro',
-                    message: firstError[0],
-                    type: 'error',
-                })
-            } else {
-                setModal({
-                    visible: true,
-                    title: 'Erro',
-                    message: error.response?.data?.message || 'Erro ao criar conta.',
-                    type: 'error',
-                })
-            }
         } finally {
             setLoading(false)
         }
     }
 
+    useEffect(() => {
+        carregarDados()
+    }, [])
+
+    function formatarNumero(valor: string) {
+
+        return valor
+            .replace(',', '.')
+            .replace(/[^0-9.]/g, '')
+    }
+
+    function atualizarCampo(
+        index: number,
+        campo: keyof ClimaMensal,
+        valor: string
+    ) {
+
+        const valorFormatado = formatarNumero(valor)
+
+        const copia = [...dados]
+
+        copia[index] = {
+            ...copia[index],
+            [campo]: valorFormatado as any,
+        }
+
+        setDados(copia)
+    }
+
+    function limparMes(index: number) {
+
+        const copia = [...dados]
+
+        copia[index] = {
+            ...copia[index],
+            temperatura_minima: '' as any,
+            temperatura_maxima: '' as any,
+            precipitacao_mm: '' as any,
+        }
+
+        setDados(copia)
+    }
+
+    function limparTodos() {
+
+        const novosDados = dados.map((item) => ({
+            ...item,
+            temperatura_minima: '' as any,
+            temperatura_maxima: '' as any,
+            precipitacao_mm: '' as any,
+        }))
+
+        setDados(novosDados)
+
+        setModal({
+            visible: true,
+            title: 'Campos limpos',
+            message: 'Todos os dados climáticos foram removidos.',
+            type: 'success',
+        })
+    }
+
+    function corClassificacao(classificacao: string) {
+
+        switch (classificacao) {
+
+            case 'chuva':
+                return '#D8F3DC'
+
+            case 'transicao':
+                return '#FFF3BF'
+
+            case 'seca':
+                return '#FFE3E3'
+
+            default:
+                return Colors.white
+        }
+    }
+
+    if (loading) {
+
+        return (
+            <View
+                style={[
+                    globalStyles.screen,
+                    globalStyles.center
+                ]}
+            >
+                <ActivityIndicator
+                    size="large"
+                    color={Colors.primary}
+                />
+            </View>
+        )
+    }
+
     return (
+
         <KeyboardAvoidingView
             style={globalStyles.screen}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
+
             <ScrollView
-                contentContainerStyle={globalStyles.scrollContentLoggedOut}
+                contentContainerStyle={globalStyles.scrollContent}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}
             >
-                <BackHeader
-                    title="Criar conta"
-                    effectPhrase={''}
-                    subtitle="Preencha seus dados para começar"
-                    showLogo={false}
-                />
 
-                {/* Formulário */}
-                <View style={styles.form}>
+                {/* ── Header ───────────────────────────── */}
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Nome completo *</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Seu nome completo"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={name}
-                            onChangeText={setName}
-                            autoCapitalize="words"
-                        />
-                    </View>
+                <View style={styles.header}>
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Email *</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="seu@email.com"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={email}
-                            onChangeText={setEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                        />
-                    </View>
+                    <View style={styles.headerTop}>
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Nome de usuário *</Text>
-                        <View style={styles.usernameContainer}>
-                            <Text style={styles.usernamePrefix}>@</Text>
-                            <TextInput
-                                style={styles.usernameInput}
-                                placeholder="seu_usuario"
-                                placeholderTextColor={Colors.gray[400]}
-                                value={username}
-                                onChangeText={setUsername}
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                            />
+                        <View style={{ flex: 1 }}>
+
+                            <Text style={globalStyles.pageTitle}>
+                                Acúmulo de Forragem
+                            </Text>
+
+                            <Text style={globalStyles.pageSubtitle}>
+                                Dados climáticos automáticos da sua região
+                            </Text>
+
                         </View>
-                        <Text style={globalStyles.inputHint}>Usado para que fazendeiros te encontrem</Text>
+
+                        <TouchableOpacity
+                            style={styles.clearAllButton}
+                            onPress={limparTodos}
+                        >
+                            <Trash2
+                                size={20}
+                                color={Colors.white}
+                            />
+                        </TouchableOpacity>
+
                     </View>
-
-                    <MaskedInput
-                        label="Telefone"
-                        value={phone}
-                        onChange={setPhone}
-                        placeholder="(62) 99999-9999"
-                        keyboardType="phone-pad"
-                        mask={phoneMask}
-                    />
-
-                    <MaskedInput
-                        label="WhatsApp"
-                        value={whatsapp}
-                        onChange={setWhatsapp}
-                        placeholder="(62) 99999-9999"
-                        keyboardType="phone-pad"
-                        mask={phoneMask}
-                    />
-
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Senha *</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Mínimo 8 caracteres"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
-                    </View>
-
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Confirmar senha *</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Repita sua senha"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={passwordConfirmation}
-                            onChangeText={setPasswordConfirmation}
-                            secureTextEntry
-                        />
-                    </View>
-
-                    <TouchableOpacity
-                        style={[
-                            globalStyles.buttonPrimary,
-                            loading && globalStyles.buttonDisabled
-                        ]}
-                        onPress={handleRegister}
-                        disabled={loading}
-                    >
-                        {loading ? (
-                            <ActivityIndicator color={Colors.white} />
-                        ) : (
-                            <Text style={globalStyles.buttonPrimaryText}>Criar conta</Text>
-                        )}
-                    </TouchableOpacity>
 
                 </View>
 
-                {/* Link para login */}
-                <View style={styles.footer}>
-                    <Text style={styles.footerText}>Já tem conta? </Text>
-                    <TouchableOpacity onPress={() => router.replace('/auth/login')}>
-                        <Text style={styles.footerLink}>Entrar</Text>
-                    </TouchableOpacity>
+                {/* ── Legendas ─────────────────────────── */}
+
+                <View style={styles.legendRow}>
+
+                    <View style={styles.legendSpacer} />
+
+                    <Text style={styles.legendText}>
+                        Temp. Min
+                    </Text>
+
+                    <Text style={styles.legendText}>
+                        Temp. Max
+                    </Text>
+
+                    <Text style={styles.legendText}>
+                        PRCP
+                    </Text>
+
+                    <View style={styles.legendIconSpacer} />
+
+                </View>
+
+                {/* ── Tabela ───────────────────────────── */}
+
+                <View style={styles.table}>
+
+                    {
+                        dados.map((item, index) => (
+
+                            <View
+                                key={index}
+                                style={[
+                                    styles.row,
+                                    {
+                                        backgroundColor:
+                                            corClassificacao(
+                                                item.classificacao
+                                            ),
+                                    }
+                                ]}
+                            >
+
+                                {/* Mês */}
+
+                                <Text style={styles.mes}>
+                                    {meses[item.mes - 1]}
+                                </Text>
+
+                                {/* Temp Min */}
+
+                                <TextInput
+                                    value={String(
+                                        item.temperatura_minima ?? ''
+                                    )}
+                                    keyboardType="decimal-pad"
+                                    onChangeText={(text) =>
+                                        atualizarCampo(
+                                            index,
+                                            'temperatura_minima',
+                                            text
+                                        )
+                                    }
+                                    style={styles.input}
+                                    placeholder='°C'
+                                    placeholderTextColor={Colors.gray[400]}
+                                />
+
+                                {/* Temp Max */}
+
+                                <TextInput
+                                    value={String(
+                                        item.temperatura_maxima ?? ''
+                                    )}
+                                    keyboardType="decimal-pad"
+                                    onChangeText={(text) =>
+                                        atualizarCampo(
+                                            index,
+                                            'temperatura_maxima',
+                                            text
+                                        )
+                                    }
+                                    style={styles.input}
+                                    placeholder='°C'
+                                    placeholderTextColor={Colors.gray[400]}
+                                />
+
+                                {/* PRCP */}
+
+                                <TextInput
+                                    value={String(
+                                        item.precipitacao_mm ?? ''
+                                    )}
+                                    keyboardType="decimal-pad"
+                                    onChangeText={(text) =>
+                                        atualizarCampo(
+                                            index,
+                                            'precipitacao_mm',
+                                            text
+                                        )
+                                    }
+                                    style={styles.input}
+                                    placeholder='mm'
+                                    placeholderTextColor={Colors.gray[400]}
+                                />
+
+                                {/* Botão limpar */}
+
+                                <TouchableOpacity
+                                    style={styles.clearButton}
+                                    onPress={() => limparMes(index)}
+                                >
+                                    <BrushCleaning
+                                        size={18}
+                                        color={Colors.white}
+                                    />
+                                </TouchableOpacity>
+
+                            </View>
+                        ))
+                    }
+
                 </View>
 
             </ScrollView>
@@ -242,56 +379,99 @@ export default function Register() {
                 title={modal.title}
                 message={modal.message}
                 type={modal.type}
-                onClose={() => {
-                    setModal(prev => ({ ...prev, visible: false }))
-
-                    if (isSuccess) {
-                        setIsSuccess(false)
-                        router.replace('/consultor/perfil')
-                    }
-                }}
+                onClose={() =>
+                    setModal(prev => ({
+                        ...prev,
+                        visible: false
+                    }))
+                }
             />
+
         </KeyboardAvoidingView>
     )
 }
 
 const styles = StyleSheet.create({
-    form: {
-        gap: Spacing.md,
+
+    header: {
+        marginBottom: Spacing.lg,
     },
-    usernameContainer: {
+
+    headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: Colors.white,
-        borderWidth: 1.5,
-        borderColor: Colors.gray[300],
-        borderRadius: BorderRadius.md,
-        paddingHorizontal: Spacing.md,
+        gap: Spacing.md,
     },
-    usernamePrefix: {
-        fontSize: FontSize.md,
-        color: Colors.primary,
-        fontWeight: 'bold',
-        marginRight: 4,
+
+    clearAllButton: {
+        width: 44,
+        height: 44,
+        borderRadius: BorderRadius.full,
+        backgroundColor: Colors.red,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    usernameInput: {
+
+    legendRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: Spacing.sm,
+        paddingHorizontal: Spacing.sm,
+    },
+
+    legendSpacer: {
+        width: 55,
+    },
+
+    legendText: {
         flex: 1,
-        paddingVertical: Spacing.sm,
-        fontSize: FontSize.md,
+        textAlign: 'center',
+        fontSize: FontSize.xs,
+        color: Colors.gray[700],
+        fontWeight: '600',
+    },
+
+    legendIconSpacer: {
+        width: 40,
+    },
+
+    table: {
+        gap: Spacing.sm,
+        paddingBottom: 100,
+    },
+
+    row: {
+        borderRadius: BorderRadius.lg,
+        padding: Spacing.md,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.sm,
+    },
+
+    mes: {
+        width: 40,
+        fontWeight: 'bold',
+        fontSize: FontSize.lg,
         color: Colors.black,
     },
-    footer: {
-        flexDirection: 'row',
+
+    input: {
+        flex: 1,
+        backgroundColor: Colors.white,
+        borderRadius: BorderRadius.md,
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: 12,
+        fontSize: FontSize.sm,
+        textAlign: 'center',
+        color: Colors.black,
+    },
+
+    clearButton: {
+        width: 36,
+        height: 36,
+        borderRadius: BorderRadius.full,
+        backgroundColor: Colors.red,
         justifyContent: 'center',
-        marginTop: Spacing.xl,
-    },
-    footerText: {
-        color: Colors.gray[600],
-        fontSize: FontSize.sm,
-    },
-    footerLink: {
-        color: Colors.primary,
-        fontSize: FontSize.sm,
-        fontWeight: 'bold',
+        alignItems: 'center',
     },
 })

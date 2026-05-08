@@ -9,6 +9,7 @@ import {
     Search,
     Wheat,
     PillBottle,
+    CloudRain,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -22,4 +23,5 @@ export const Icons = {
     search: Search,
     wheat: Wheat,
     supplementation: PillBottle,
+    forragem: CloudRain,
 }
