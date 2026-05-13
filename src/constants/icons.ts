@@ -10,6 +10,7 @@ import {
     Wheat,
     PillBottle,
     CloudRain,
+    CircleAlert,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -24,4 +25,5 @@ export const Icons = {
     wheat: Wheat,
     supplementation: PillBottle,
     forragem: CloudRain,
+    circleAlert: CircleAlert
 }
