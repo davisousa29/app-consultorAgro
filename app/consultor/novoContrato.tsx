@@ -11,7 +11,7 @@ import {
     Platform,
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
-import { ChevronLeft, ChevronDown } from 'lucide-react-native'
+import { ChevronDown } from 'lucide-react-native'
 import { buscarPerfilFazendeiro } from '../../src/services/buscaService'
 import { proporContrato } from '../../src/services/contratoService'
 import { FazendeiroPublico } from '../../src/types'
@@ -20,6 +20,7 @@ import { globalStyles } from '../../src/constants/globalStyles'
 import DateInput from '../../src/components/Input/DateInput'
 import CurrencyInput, { parsearMoeda } from '../../src/components/Input/CurrencyInput'
 import CentralModal from '../../src/components/Modal/CentralModal'
+import BackButton from "../../src/components/Header/BackButton";
 
 
 
@@ -137,10 +138,7 @@ export default function NovoContratoScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* ── Voltar ────────────────────────────── */}
-                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-                    <ChevronLeft size={20} color={Colors.primary} />
-                    <Text style={styles.backText}>Voltar</Text>
-                </TouchableOpacity>
+                <BackButton />
 
                 {/* ── Cabeçalho ─────────────────────────── */}
                 <View style={styles.header}>

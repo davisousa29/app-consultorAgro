@@ -10,11 +10,12 @@ import {
     Alert,
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
-import { MapPin, Phone, ChevronLeft, MessageCircle, FileText } from 'lucide-react-native'
+import { MapPin, Phone, MessageCircle, FileText } from 'lucide-react-native'
 import { buscarPerfilFazendeiro } from '../../../src/services/buscaService'
 import { FazendeiroPublico } from '../../../src/types'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
 import { globalStyles } from '../../../src/constants/globalStyles'
+import BackButton from "../../../src/components/Header/BackButton";
 
 export default function PerfilFazendeiroScreen() {
     const { username } = useLocalSearchParams<{ username: string }>()
@@ -54,13 +55,7 @@ export default function PerfilFazendeiroScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* ── Botão voltar ──────────────────────── */}
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => router.back()}
-                >
-                    <ChevronLeft size={20} color={Colors.primary} />
-                    <Text style={styles.backText}>Voltar</Text>
-                </TouchableOpacity>
+                <BackButton />
 
                 {/* ── Cabeçalho do perfil ───────────────── */}
                 <View style={styles.profileHeader}>
