@@ -18,7 +18,7 @@ import { FazendeiroPublico } from '../../src/types'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
 import { globalStyles } from '../../src/constants/globalStyles'
 import DateInput from '../../src/components/Input/DateInput'
-import CurrencyInput, { parsearMoeda } from '../../src/components/Input/CurrencyInput'
+import CurrencyInput, { parseCurrency } from '../../src/components/Input/CurrencyInput'
 import CentralModal from '../../src/components/Modal/CentralModal'
 import BackButton from "../../src/components/Header/BackButton";
 
@@ -102,7 +102,7 @@ export default function NovoContratoScreen() {
                 fazenda_id: fazendaSelecionada,
                 start_date: inicioConvertida,
                 end_date: fimConvertida,
-                value: valor ? parsearMoeda(valor) : undefined,
+                value: valor ? parseCurrency(valor) : undefined,
                 scope_description: descricao || undefined,
             })
 

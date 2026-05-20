@@ -1,6 +1,7 @@
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { globalStyles } from '../../constants/globalStyles'
 import { Colors, BorderRadius, FontSize, Spacing } from '../../constants'
+import { currencyMask, parseCurrency } from '../../utils/masks/currencyMask'
 
 interface CurrencyInputProps {
     label: string
@@ -9,28 +10,12 @@ interface CurrencyInputProps {
     hint?: string
 }
 
-function formatarMoeda(texto: string): string {
-    // Remove tudo que não é número
-    const numeros = texto.replace(/\D/g, '')
-    if (!numeros) return ''
-
-    // Converte para centavos e formata
-    const valor = parseInt(numeros) / 100
-    return valor.toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-    })
-}
-
-export function parsearMoeda(texto: string): number {
-    const limpo = texto.replace(/\./g, '').replace(',', '.')
-    return parseFloat(limpo) || 0
-}
+export { parseCurrency }
 
 export default function CurrencyInput({ label, value, onChange, hint }: CurrencyInputProps) {
 
     function handleChange(texto: string) {
-        const formatado = formatarMoeda(texto)
+        const formatado = currencyMask(texto)
         onChange(formatado)
     }
 

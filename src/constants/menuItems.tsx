@@ -22,18 +22,18 @@ export const menuItems = [
         path: '/consultor/busca',
     },
     {
-        icon: Icons.supplementation,
-        label: 'Suplementação',
-        path: '/consultor/suplementacao'
-    },
-    {
         icon: Icons.wheat,
         label: 'Formulação de ração',
-        path: '/consultor/formulacaoRacao'
+        path: '/consultor/racao',
+    },
+    {
+        icon: Icons.supplementation,
+        label: 'Suplementação',
+        path: '/consultor/suplementacao',
     },
     {
         icon: Icons.forragem,
         label: 'Forragem',
-        path: '/consultor/forragem'
+        path: '/consultor/forragem',
     },
 ]

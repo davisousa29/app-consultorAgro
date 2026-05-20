@@ -11,6 +11,12 @@ import {
     PillBottle,
     CloudRain,
     CircleAlert,
+    PawPrint,
+    Scale,
+    DollarSign,
+    HandCoins,
+    Save,
+    Handshake,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -25,5 +31,11 @@ export const Icons = {
     wheat: Wheat,
     supplementation: PillBottle,
     forragem: CloudRain,
-    circleAlert: CircleAlert
+    circleAlert: CircleAlert,
+    pawPrint: PawPrint,
+    scale: Scale,
+    dolar: DollarSign,
+    handCoins: HandCoins,
+    save: Save,
+    handShake: Handshake,
 }
