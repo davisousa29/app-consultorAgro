@@ -42,6 +42,7 @@ export const globalStyles = StyleSheet.create({
     buttonSecondary: {
         backgroundColor: Colors.white,
         paddingVertical: Spacing.md,
+        paddingHorizontal: Spacing.md,
         borderRadius: BorderRadius.md,
         alignItems: 'center' as const,
         borderWidth: 1.5,

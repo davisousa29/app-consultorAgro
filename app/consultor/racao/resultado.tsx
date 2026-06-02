@@ -204,7 +204,7 @@ export default function RacaoStep4() {
                         <View style={styles.resumoCard}>
                             <Icons.pawPrint size={25} color={Colors.primary} />
                             <Text style={styles.resumoValor}>{quantidade}</Text>
-                            <Text style={styles.resumoLabel}>animal{quantidade > 1 ? 'is' : ''}</Text>
+                            <Text style={styles.resumoLabel}>anim{quantidade > 1 ? 'ais' : 'al'}</Text>
                         </View>
                         <View style={styles.resumoCard}>
                             <Icons.scale size={25} color={Colors.primary} />

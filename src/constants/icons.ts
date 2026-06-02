@@ -17,6 +17,9 @@ import {
     HandCoins,
     Save,
     Handshake,
+    FlaskConical,
+    MilkOff,
+    Clipboard,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -38,4 +41,7 @@ export const Icons = {
     handCoins: HandCoins,
     save: Save,
     handShake: Handshake,
+    flaskConical: FlaskConical,
+    notFoundBottle: MilkOff,
+    clipBoard: Clipboard,
 }

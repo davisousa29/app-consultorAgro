@@ -36,4 +36,9 @@ export const menuItems = [
         label: 'Forragem',
         path: '/consultor/forragem',
     },
+    {
+        icon: Icons.flaskConical,
+        label: 'Minhas Formulações',
+        path: '/consultor/formulacoes',
+    },
 ]
