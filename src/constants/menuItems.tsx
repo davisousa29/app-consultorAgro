@@ -41,4 +41,9 @@ export const menuItems = [
         label: 'Minhas Formulações',
         path: '/consultor/formulacoes',
     },
+    {
+        icon: Icons.trendingUp,
+        label: 'Projeção de Venda',
+        path: '/consultor/projecao',
+    },
 ]

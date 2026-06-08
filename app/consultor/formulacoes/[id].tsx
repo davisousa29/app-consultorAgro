@@ -10,8 +10,6 @@ import {
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router'
 import {
     FlaskConical,
-    Calendar,
-    DollarSign,
     FileText,
     CheckCircle,
     XCircle,
@@ -24,7 +22,10 @@ import CentralModal from '../../../src/components/Modal/CentralModal'
 import api from '../../../src/services/api'
 import { formatarNumero } from '../../../src/utils/numbers'
 import { currencyMask } from '../../../src/utils/masks/currencyMask'
-import {Icons} from "../../../src/constants/icons";
+import { Icons } from '../../../src/constants/icons'
+import { toastErro, toastInfo, toastSucesso } from '../../../src/utils/toast'
+import * as Print from 'expo-print'
+import * as Sharing from 'expo-sharing'
 
 interface Ingrediente {
     id: string
@@ -91,9 +92,7 @@ function StatusBadge({ status }: { status: string }) {
         rascunho:  { cor: '#FAB005', icone: AlertCircle, label: 'Rascunho' },
         encerrado: { cor: '#6C757D', icone: XCircle,     label: 'Encerrado' },
     }[status] ?? { cor: '#6C757D', icone: AlertCircle, label: status }
-
     const Icone = config.icone
-
     return (
         <View style={[styles.badge, { backgroundColor: config.cor + '20' }]}>
             <Icone size={12} color={config.cor} />
@@ -103,15 +102,11 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function BalancoItem({ label, fornecido, exigido, unidade }: {
-    label: string
-    fornecido: number
-    exigido: number
-    unidade: string
+    label: string; fornecido: number; exigido: number; unidade: string
 }) {
     const pct = exigido > 0 ? (fornecido / exigido) * 100 : 0
     const status = pct >= 95 && pct <= 115 ? 'ok' : pct < 95 ? 'baixo' : 'alto'
     const cor = status === 'ok' ? Colors.success : status === 'baixo' ? Colors.error : Colors.warning
-
     return (
         <View style={styles.balancoItem}>
             <View style={styles.balancoHeader}>
@@ -138,23 +133,18 @@ export default function FormulacaoDetalheScreen() {
     const [programa, setPrograma] = useState<Programa | null>(null)
     const [loading, setLoading] = useState(true)
     const [encerrando, setEncerrando] = useState(false)
+    const [gerandoPdf, setGerandoPdf] = useState(false)
     const [contratosAtivos, setContratosAtivos] = useState<any[]>([])
     const [mostrarContratos, setMostrarContratos] = useState(false)
     const [loadingContratos, setLoadingContratos] = useState(false)
     const [vinculando, setVinculando] = useState(false)
     const [modal, setModal] = useState({
-        visible: false,
-        title: '',
-        message: '',
+        visible: false, title: '', message: '',
         type: 'default' as 'default' | 'success' | 'error',
         onClose: undefined as (() => void) | undefined,
     })
 
-    useFocusEffect(
-        useCallback(() => {
-            carregarPrograma()
-        }, [id])
-    )
+    useFocusEffect(useCallback(() => { carregarPrograma() }, [id]))
 
     async function carregarPrograma() {
         setLoading(true)
@@ -162,47 +152,23 @@ export default function FormulacaoDetalheScreen() {
             const response = await api.get(`/racao/programas/${id}`)
             setPrograma(response.data.programa)
         } catch {
-            setModal({
-                visible: true,
-                title: 'Erro',
-                message: 'Não foi possível carregar a formulação.',
-                type: 'error',
-                onClose: () => router.back(),
-            })
+            setModal({ visible: true, title: 'Erro', message: 'Não foi possível carregar a formulação.', type: 'error', onClose: () => router.back() })
         } finally {
             setLoading(false)
         }
     }
 
     async function handleEncerrar() {
-        setModal({
-            visible: true,
-            title: 'Encerrar formulação',
-            message: 'Tem certeza que deseja encerrar esta formulação?',
-            type: 'default',
-            onClose: confirmarEncerramento,
-        })
+        setModal({ visible: true, title: 'Encerrar formulação', message: 'Tem certeza que deseja encerrar esta formulação?', type: 'default', onClose: confirmarEncerramento })
     }
 
     async function confirmarEncerramento() {
         setEncerrando(true)
         try {
             await api.post(`/racao/programas/${id}/encerrar`)
-            setModal({
-                visible: true,
-                title: 'Encerrada!',
-                message: 'A formulação foi encerrada com sucesso.',
-                type: 'success',
-                onClose: () => carregarPrograma(),
-            })
+            setModal({ visible: true, title: 'Encerrada!', message: 'A formulação foi encerrada com sucesso.', type: 'success', onClose: () => carregarPrograma() })
         } catch (error: any) {
-            setModal({
-                visible: true,
-                title: 'Erro',
-                message: error.response?.data?.message || 'Erro ao encerrar.',
-                type: 'error',
-                onClose: undefined,
-            })
+            setModal({ visible: true, title: 'Erro', message: error.response?.data?.message || 'Erro ao encerrar.', type: 'error', onClose: undefined })
         } finally {
             setEncerrando(false)
         }
@@ -213,16 +179,14 @@ export default function FormulacaoDetalheScreen() {
         try {
             const response = await api.get('/contratos')
             const ativos = response.data.contratos.filter((c: any) => c.status === 'ativo')
+            if (ativos.length === 0) {
+                toastInfo('Nenhum contrato ativo encontrado.')
+                return
+            }
             setContratosAtivos(ativos)
             setMostrarContratos(true)
         } catch {
-            setModal({
-                visible: true,
-                title: 'Erro',
-                message: 'Não foi possível carregar os contratos.',
-                type: 'error',
-                onClose: undefined,
-            })
+            toastErro('Não foi possível carregar os contratos.')
         } finally {
             setLoadingContratos(false)
         }
@@ -232,7 +196,6 @@ export default function FormulacaoDetalheScreen() {
         setMostrarContratos(false)
         setVinculando(true)
         try {
-            // Cria cópia da formulação vinculada ao contrato
             const programaRes = await api.post('/racao/programas', {
                 contrato_id:        contratoId,
                 nome:               programa!.nome,
@@ -252,10 +215,7 @@ export default function FormulacaoDetalheScreen() {
                 exig_ca_g:          Number(programa!.exig_ca_g),
                 exig_p_g:           Number(programa!.exig_p_g),
             })
-
             const novoId = programaRes.data.programa.id
-
-            // Copia os ingredientes
             if (programa!.ingredientes.length > 0) {
                 await api.post(`/racao/programas/${novoId}/ingredientes`, {
                     ingredientes: programa!.ingredientes.map(ing => ({
@@ -266,24 +226,31 @@ export default function FormulacaoDetalheScreen() {
                     })),
                 })
             }
-
-            setModal({
-                visible: true,
-                title: 'Vinculado com sucesso!',
-                message: 'Uma cópia desta formulação foi criada e vinculada ao contrato.',
-                type: 'success',
-                onClose: () => router.push(`/consultor/formulacoes/${novoId}` as any),
-            })
+            toastSucesso('Formulação vinculada ao contrato com sucesso.')
+            router.push(`/consultor/formulacoes/${novoId}` as any)
         } catch (error: any) {
-            setModal({
-                visible: true,
-                title: 'Erro',
-                message: error.response?.data?.message || 'Erro ao vincular formulação.',
-                type: 'error',
-                onClose: undefined,
-            })
+            toastErro(error.response?.data?.message || 'Erro ao vincular formulação.')
         } finally {
             setVinculando(false)
+        }
+    }
+
+    async function handleGerarPdf() {
+        setGerandoPdf(true)
+        try {
+            const response = await api.get(`/racao/programas/${id}/pdf`)
+            const html = response.data.html
+            const { uri } = await Print.printToFileAsync({ html, base64: false })
+            const podeCompartilhar = await Sharing.isAvailableAsync()
+            if (podeCompartilhar) {
+                await Sharing.shareAsync(uri, { mimeType: 'application/pdf', dialogTitle: programa!.nome, UTI: 'com.adobe.pdf' })
+            } else {
+                toastSucesso(`PDF salvo em: ${uri}`, 'PDF gerado!')
+            }
+        } catch {
+            toastErro('Não foi possível gerar o PDF.')
+        } finally {
+            setGerandoPdf(false)
         }
     }
 
@@ -303,23 +270,14 @@ export default function FormulacaoDetalheScreen() {
     if (!programa) return null
 
     const custoLoteDia = Number(programa.custo_animal_dia) * programa.quantidade_animais
-
-    // Calcula fornecido baseado nos ingredientes
-    const fornecidoELm = programa.ingredientes.reduce((acc, ing) =>
-        acc + Number(ing.contrib_elm_mcal), 0)
-    const fornecidoPB = programa.ingredientes.reduce((acc, ing) =>
-        acc + Number(ing.contrib_pb_g), 0)
-    const fornecidoCa = programa.ingredientes.reduce((acc, ing) =>
-        acc + Number(ing.contrib_ca_g), 0)
-    const fornecidoP = programa.ingredientes.reduce((acc, ing) =>
-        acc + Number(ing.contrib_p_g), 0)
+    const fornecidoELm = programa.ingredientes.reduce((acc, ing) => acc + Number(ing.contrib_elm_mcal), 0)
+    const fornecidoPB  = programa.ingredientes.reduce((acc, ing) => acc + Number(ing.contrib_pb_g), 0)
+    const fornecidoCa  = programa.ingredientes.reduce((acc, ing) => acc + Number(ing.contrib_ca_g), 0)
+    const fornecidoP   = programa.ingredientes.reduce((acc, ing) => acc + Number(ing.contrib_p_g), 0)
 
     return (
         <View style={globalStyles.screen}>
-            <ScrollView
-                contentContainerStyle={styles.scroll}
-                showsVerticalScrollIndicator={false}
-            >
+            <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
                 <BackButton />
 
                 {/* Cabeçalho */}
@@ -329,14 +287,10 @@ export default function FormulacaoDetalheScreen() {
                             <FlaskConical size={28} color={Colors.primary} />
                         </View>
                         <View style={{ flex: 1 }}>
-                            <Text style={globalStyles.pageTitle} numberOfLines={2}>
-                                {programa.nome}
-                            </Text>
+                            <Text style={globalStyles.pageTitle} numberOfLines={2}>{programa.nome}</Text>
                             <View style={styles.cabecalhoInfo}>
                                 <StatusBadge status={programa.status} />
-                                <Text style={styles.cabecalhoData}>
-                                    {formatarData(programa.created_at)}
-                                </Text>
+                                <Text style={styles.cabecalhoData}>{formatarData(programa.created_at)}</Text>
                             </View>
                         </View>
                     </View>
@@ -358,16 +312,12 @@ export default function FormulacaoDetalheScreen() {
                         </View>
                         <View style={styles.resumoCard}>
                             <Icons.dolar size={25} color={Colors.primary} />
-                            <Text style={styles.resumoValor}>
-                                R$ {currencyMask(String(Math.round(Number(programa.custo_animal_dia) * 100)))}
-                            </Text>
+                            <Text style={styles.resumoValor}>R$ {currencyMask(String(Math.round(Number(programa.custo_animal_dia) * 100)))}</Text>
                             <Text style={styles.resumoLabel}>custo/animal/dia</Text>
                         </View>
                         <View style={styles.resumoCard}>
                             <Icons.handCoins size={25} color={Colors.primary} />
-                            <Text style={styles.resumoValor}>
-                                R$ {currencyMask(String(Math.round(custoLoteDia * 100)))}
-                            </Text>
+                            <Text style={styles.resumoValor}>R$ {currencyMask(String(Math.round(custoLoteDia * 100)))}</Text>
                             <Text style={styles.resumoLabel}>custo total/dia</Text>
                         </View>
                     </View>
@@ -378,15 +328,15 @@ export default function FormulacaoDetalheScreen() {
                     <Text style={styles.secaoTitulo}>Dados do animal</Text>
                     <View style={styles.card}>
                         {[
-                            { label: 'Espécie', valor: programa.especie?.nome },
-                            { label: 'Raça', valor: programa.raca?.nome },
-                            { label: 'Categoria', valor: programa.categoria?.nome },
-                            { label: 'Sistema', valor: programa.sistema?.nome },
+                            { label: 'Espécie',    valor: programa.especie?.nome },
+                            { label: 'Raça',       valor: programa.raca?.nome },
+                            { label: 'Categoria',  valor: programa.categoria?.nome },
+                            { label: 'Sistema',    valor: programa.sistema?.nome },
                             { label: 'Peso inicial', valor: `${programa.peso_inicial_kg} kg` },
-                            { label: 'Peso final', valor: `${programa.peso_final_kg} kg` },
-                            { label: 'Peso médio', valor: `${programa.peso_medio_kg} kg` },
+                            { label: 'Peso final',   valor: `${programa.peso_final_kg} kg` },
+                            { label: 'Peso médio',   valor: `${programa.peso_medio_kg} kg` },
                             { label: 'GMD desejado', valor: `${programa.gmd_kg} kg/dia` },
-                            { label: 'Referência', valor: programa.referencia_nutricional },
+                            { label: 'Referência',   valor: programa.referencia_nutricional },
                         ].map((item, index, arr) => (
                             <View key={index}>
                                 <View style={styles.infoRow}>
@@ -399,7 +349,7 @@ export default function FormulacaoDetalheScreen() {
                     </View>
                 </View>
 
-                {/* Exigências nutricionais */}
+                {/* Exigências */}
                 <View style={styles.secao}>
                     <Text style={styles.secaoTitulo}>Exigências nutricionais</Text>
                     <View style={styles.card}>
@@ -407,9 +357,9 @@ export default function FormulacaoDetalheScreen() {
                             { label: 'CMS', valor: `${programa.exig_cms_kg} kg/dia` },
                             { label: 'ELm', valor: `${programa.exig_elm_mcal} Mcal/dia` },
                             { label: 'ELg', valor: `${programa.exig_elg_mcal} Mcal/dia` },
-                            { label: 'PB', valor: `${programa.exig_pb_g} g/dia` },
-                            { label: 'Ca', valor: `${programa.exig_ca_g} g/dia` },
-                            { label: 'P', valor: `${programa.exig_p_g} g/dia` },
+                            { label: 'PB',  valor: `${programa.exig_pb_g} g/dia` },
+                            { label: 'Ca',  valor: `${programa.exig_ca_g} g/dia` },
+                            { label: 'P',   valor: `${programa.exig_p_g} g/dia` },
                         ].map((item, index, arr) => (
                             <View key={index}>
                                 <View style={styles.infoRow}>
@@ -433,18 +383,12 @@ export default function FormulacaoDetalheScreen() {
                                     <View style={styles.ingRow}>
                                         <View style={{ flex: 1 }}>
                                             <Text style={styles.ingNome}>{ing.ingrediente.nome}</Text>
-                                            <Text style={styles.ingTipo}>
-                                                {ing.tipo.replace(/_/g, ' ')} · MS: {Number(ing.ingrediente.ms_pct).toFixed(0)}%
-                                            </Text>
-                                            <Text style={styles.ingConsumo}>
-                                                {formatarNumero(Number(ing.consumo_ms_kg), 3)} kg MS/dia · {formatarNumero(Number(ing.consumo_mn_kg), 3)} kg MN/dia
-                                            </Text>
+                                            <Text style={styles.ingTipo}>{ing.tipo.replace(/_/g, ' ')} · MS: {Number(ing.ingrediente.ms_pct).toFixed(0)}%</Text>
+                                            <Text style={styles.ingConsumo}>{formatarNumero(Number(ing.consumo_ms_kg), 3)} kg MS/dia · {formatarNumero(Number(ing.consumo_mn_kg), 3)} kg MN/dia</Text>
                                         </View>
                                         <View style={styles.ingDireita}>
                                             <Text style={styles.ingProporcao}>{Number(ing.proporcao_pct).toFixed(0)}%</Text>
-                                            <Text style={styles.ingCusto}>
-                                                R$ {Number(ing.custo_animal_dia).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/dia
-                                            </Text>
+                                            <Text style={styles.ingCusto}>R$ {Number(ing.custo_animal_dia).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}/dia</Text>
                                         </View>
                                     </View>
                                 </View>
@@ -459,33 +403,13 @@ export default function FormulacaoDetalheScreen() {
                         <Text style={styles.secaoTitulo}>Balanço nutricional</Text>
                         <Text style={styles.secaoSubtitulo}>Fornecido vs Exigido</Text>
                         <View style={styles.card}>
-                            <BalancoItem
-                                label="Energia Líquida Mantença"
-                                fornecido={fornecidoELm}
-                                exigido={Number(programa.exig_elm_mcal)}
-                                unidade="Mcal"
-                            />
+                            <BalancoItem label="Energia Líquida Mantença" fornecido={fornecidoELm} exigido={Number(programa.exig_elm_mcal)} unidade="Mcal" />
                             <View style={styles.divisor} />
-                            <BalancoItem
-                                label="Proteína Bruta"
-                                fornecido={fornecidoPB}
-                                exigido={Number(programa.exig_pb_g)}
-                                unidade="g"
-                            />
+                            <BalancoItem label="Proteína Bruta" fornecido={fornecidoPB} exigido={Number(programa.exig_pb_g)} unidade="g" />
                             <View style={styles.divisor} />
-                            <BalancoItem
-                                label="Cálcio"
-                                fornecido={fornecidoCa}
-                                exigido={Number(programa.exig_ca_g)}
-                                unidade="g"
-                            />
+                            <BalancoItem label="Cálcio" fornecido={fornecidoCa} exigido={Number(programa.exig_ca_g)} unidade="g" />
                             <View style={styles.divisor} />
-                            <BalancoItem
-                                label="Fósforo"
-                                fornecido={fornecidoP}
-                                exigido={Number(programa.exig_p_g)}
-                                unidade="g"
-                            />
+                            <BalancoItem label="Fósforo" fornecido={fornecidoP} exigido={Number(programa.exig_p_g)} unidade="g" />
                         </View>
                     </View>
                 )}
@@ -502,74 +426,79 @@ export default function FormulacaoDetalheScreen() {
                             <FileText size={20} color={Colors.primary} />
                             <View style={{ flex: 1 }}>
                                 <Text style={styles.contratoNome}>{programa.contrato.fazenda?.name}</Text>
-                                <Text style={styles.contratoFazendeiro}>
-                                    @{programa.contrato.fazendeiro?.username}
-                                </Text>
+                                <Text style={styles.contratoFazendeiro}>@{programa.contrato.fazendeiro?.username}</Text>
                             </View>
                             <Text style={styles.contratoVer}>Ver contrato →</Text>
                         </TouchableOpacity>
                     </View>
                 )}
 
-                {programa.status !== 'encerrado' && (
-                    <View style={styles.secao}>
-                        <Text style={styles.secaoTitulo}>
-                            {programa.contrato ? 'Vincular a outro contrato' : 'Vincular a um contrato'}
-                        </Text>
+                {/* Ações */}
+                <View style={styles.secao}>
 
-                        <TouchableOpacity
-                            style={[styles.botaoVincular, loadingContratos && globalStyles.buttonDisabled]}
-                            onPress={buscarContratosAtivos}
-                            disabled={loadingContratos || vinculando}
-                            activeOpacity={0.8}
-                        >
-                            {loadingContratos || vinculando ? (
-                                <ActivityIndicator color={Colors.primary} />
-                            ) : (
-                                <Text style={styles.botaoVincularTexto}>
-                                    {programa.contrato_id ? '+ Vincular a outro contrato' : '+ Vincular a um contrato'}
-                                </Text>
+                    {/* Vincular a contrato */}
+                    {programa.status !== 'encerrado' && (
+                        <View style={{ marginBottom: Spacing.md }}>
+                            <TouchableOpacity
+                                style={[styles.botaoVincular, (loadingContratos || vinculando) && globalStyles.buttonDisabled]}
+                                onPress={buscarContratosAtivos}
+                                disabled={loadingContratos || vinculando}
+                                activeOpacity={0.8}
+                            >
+                                {loadingContratos || vinculando ? (
+                                    <ActivityIndicator color={Colors.primary} />
+                                ) : (
+                                    <Text style={styles.botaoVincularTexto}>
+                                        {programa.contrato_id ? '+ Vincular a outro contrato' : '+ Vincular a um contrato'}
+                                    </Text>
+                                )}
+                            </TouchableOpacity>
+
+                            {mostrarContratos && (
+                                <View style={[styles.card, { marginTop: Spacing.sm }]}>
+                                    <Text style={styles.contratoSelecioneLabel}>Selecione um contrato</Text>
+                                    {contratosAtivos.map((contrato, index) => (
+                                        <View key={contrato.id}>
+                                            {index > 0 && <View style={styles.divisor} />}
+                                            <TouchableOpacity
+                                                style={styles.contratoOpcao}
+                                                onPress={() => handleVincular(contrato.id)}
+                                                activeOpacity={0.8}
+                                            >
+                                                <View style={{ flex: 1 }}>
+                                                    <Text style={styles.contratoNome}>{contrato.fazenda?.name ?? '—'}</Text>
+                                                    <Text style={styles.contratoFazendeiro}>@{contrato.fazendeiro?.username ?? '—'}</Text>
+                                                </View>
+                                                <Text style={styles.contratoVer}>Vincular →</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    ))}
+                                    <View style={styles.divisor} />
+                                    <TouchableOpacity style={styles.cancelarVincular} onPress={() => setMostrarContratos(false)}>
+                                        <Text style={styles.cancelarVincularTexto}>Cancelar</Text>
+                                    </TouchableOpacity>
+                                </View>
                             )}
-                        </TouchableOpacity>
+                        </View>
+                    )}
 
-                        {mostrarContratos && (
-                            <View style={[styles.card, { marginTop: Spacing.sm }]}>
-                                <Text style={styles.contratoSelecioneLabel}>
-                                    {contratosAtivos.length > 0
-                                        ? 'Selecione um contrato'
-                                        : 'Nenhum contrato ativo encontrado'}
-                                </Text>
-                                {contratosAtivos.map((contrato, index) => (
-                                    <View key={contrato.id}>
-                                        {index > 0 && <View style={styles.divisor} />}
-                                        <TouchableOpacity
-                                            style={styles.contratoOpcao}
-                                            onPress={() => handleVincular(contrato.id)}
-                                            activeOpacity={0.8}
-                                        >
-                                            <View style={{ flex: 1 }}>
-                                                <Text style={styles.contratoNome}>{contrato.fazenda?.name ?? '—'}</Text>
-                                                <Text style={styles.contratoFazendeiro}>@{contrato.fazendeiro?.username ?? '—'}</Text>
-                                            </View>
-                                            <Text style={styles.contratoVer}>Vincular →</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                ))}
-                                <View style={styles.divisor} />
-                                <TouchableOpacity
-                                    style={styles.cancelarVincular}
-                                    onPress={() => setMostrarContratos(false)}
-                                >
-                                    <Text style={styles.cancelarVincularTexto}>Cancelar</Text>
-                                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[globalStyles.buttonSecondary, gerandoPdf && globalStyles.buttonDisabled, { marginBottom: Spacing.sm }]}
+                        onPress={handleGerarPdf}
+                        disabled={gerandoPdf}
+                        activeOpacity={0.8}
+                    >
+                        {gerandoPdf ? (
+                            <ActivityIndicator color={Colors.primary} />
+                        ) : (
+                            <View style={globalStyles.buttonRow}>
+                                <Icons.graphic size={20} color={Colors.primary} />
+                                <Text style={globalStyles.buttonSecondaryText}>Gerar PDF</Text>
                             </View>
                         )}
-                    </View>
-                )}
+                    </TouchableOpacity>
 
-                {/* Ações */}
-                {programa.status === 'ativo' && (
-                    <View style={styles.secao}>
+                    {programa.status === 'ativo' && (
                         <TouchableOpacity
                             style={[styles.botaoEncerrar, encerrando && globalStyles.buttonDisabled]}
                             onPress={handleEncerrar}
@@ -582,8 +511,8 @@ export default function FormulacaoDetalheScreen() {
                                 <Text style={styles.botaoEncerrarTexto}>Encerrar formulação</Text>
                             )}
                         </TouchableOpacity>
-                    </View>
-                )}
+                    )}
+                </View>
 
             </ScrollView>
 
@@ -603,281 +532,53 @@ export default function FormulacaoDetalheScreen() {
 }
 
 const styles = StyleSheet.create({
-    scroll: {
-        paddingHorizontal: Spacing.lg,
-        paddingTop: Spacing.lg,
-        paddingBottom: Spacing.xxl,
-    },
-    cabecalho: {
-        marginBottom: Spacing.xl,
-    },
-    cabecalhoTopo: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        gap: Spacing.md,
-    },
-    cabecalhoIcone: {
-        width: 52,
-        height: 52,
-        borderRadius: 26,
-        backgroundColor: '#E8F5EE',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    cabecalhoInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: Spacing.sm,
-        marginTop: 4,
-    },
-    cabecalhoData: {
-        fontSize: FontSize.xs,
-        color: Colors.gray[500],
-    },
-    badge: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-        paddingHorizontal: Spacing.sm,
-        paddingVertical: 3,
-        borderRadius: BorderRadius.full,
-    },
-    badgeText: {
-        fontSize: FontSize.xs,
-        fontWeight: 'bold',
-    },
-    secao: {
-        marginBottom: Spacing.xl,
-    },
-    secaoTitulo: {
-        fontSize: FontSize.lg,
-        fontWeight: 'bold',
-        color: Colors.black,
-        marginBottom: Spacing.sm,
-    },
-    secaoSubtitulo: {
-        fontSize: FontSize.sm,
-        color: Colors.gray[500],
-        marginBottom: Spacing.md,
-        marginTop: -Spacing.xs,
-    },
-    resumoGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: Spacing.sm,
-    },
-    resumoCard: {
-        width: '47%',
-        backgroundColor: Colors.white,
-        borderRadius: BorderRadius.md,
-        padding: Spacing.md,
-        alignItems: 'center',
-        gap: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    resumoEmoji: { fontSize: 22 },
-    resumoValor: {
-        fontSize: FontSize.md,
-        fontWeight: 'bold',
-        color: Colors.primary,
-        textAlign: 'center',
-    },
-    resumoLabel: {
-        fontSize: FontSize.xs,
-        color: Colors.gray[500],
-        textAlign: 'center',
-    },
-    card: {
-        backgroundColor: Colors.white,
-        borderRadius: BorderRadius.lg,
-        padding: Spacing.md,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    infoRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingVertical: Spacing.sm,
-    },
-    infoLabel: {
-        fontSize: FontSize.sm,
-        color: Colors.gray[500],
-    },
-    infoValor: {
-        fontSize: FontSize.sm,
-        fontWeight: '600',
-        color: Colors.black,
-        textAlign: 'right',
-        flex: 1,
-        marginLeft: Spacing.md,
-    },
-    divisor: {
-        height: 1,
-        backgroundColor: Colors.gray[200],
-    },
-    ingRow: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        paddingVertical: Spacing.sm,
-        gap: Spacing.md,
-    },
-    ingNome: {
-        fontSize: FontSize.md,
-        fontWeight: '600',
-        color: Colors.black,
-    },
-    ingTipo: {
-        fontSize: FontSize.xs,
-        color: Colors.gray[500],
-        marginTop: 2,
-    },
-    ingConsumo: {
-        fontSize: FontSize.xs,
-        color: Colors.gray[400],
-        marginTop: 2,
-    },
-    ingDireita: {
-        alignItems: 'flex-end',
-    },
-    ingProporcao: {
-        fontSize: FontSize.lg,
-        fontWeight: 'bold',
-        color: Colors.primary,
-    },
-    ingCusto: {
-        fontSize: FontSize.xs,
-        color: Colors.gray[500],
-        marginTop: 2,
-    },
+    scroll: { paddingHorizontal: Spacing.lg, paddingTop: Spacing.lg, paddingBottom: Spacing.xxl },
+    cabecalho: { marginBottom: Spacing.xl },
+    cabecalhoTopo: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.md },
+    cabecalhoIcone: { width: 52, height: 52, borderRadius: 26, backgroundColor: '#E8F5EE', justifyContent: 'center', alignItems: 'center' },
+    cabecalhoInfo: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, marginTop: 4 },
+    cabecalhoData: { fontSize: FontSize.xs, color: Colors.gray[500] },
+    badge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: Spacing.sm, paddingVertical: 3, borderRadius: BorderRadius.full },
+    badgeText: { fontSize: FontSize.xs, fontWeight: 'bold' },
+    secao: { marginBottom: Spacing.xl },
+    secaoTitulo: { fontSize: FontSize.lg, fontWeight: 'bold', color: Colors.black, marginBottom: Spacing.sm },
+    secaoSubtitulo: { fontSize: FontSize.sm, color: Colors.gray[500], marginBottom: Spacing.md, marginTop: -Spacing.xs },
+    resumoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+    resumoCard: { width: '47%', backgroundColor: Colors.white, borderRadius: BorderRadius.md, padding: Spacing.md, alignItems: 'center', gap: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+    resumoValor: { fontSize: FontSize.md, fontWeight: 'bold', color: Colors.primary, textAlign: 'center' },
+    resumoLabel: { fontSize: FontSize.xs, color: Colors.gray[500], textAlign: 'center' },
+    card: { backgroundColor: Colors.white, borderRadius: BorderRadius.lg, padding: Spacing.md, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+    infoRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: Spacing.sm },
+    infoLabel: { fontSize: FontSize.sm, color: Colors.gray[500] },
+    infoValor: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.black, textAlign: 'right', flex: 1, marginLeft: Spacing.md },
+    divisor: { height: 1, backgroundColor: Colors.gray[200] },
+    ingRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: Spacing.sm, gap: Spacing.md },
+    ingNome: { fontSize: FontSize.md, fontWeight: '600', color: Colors.black },
+    ingTipo: { fontSize: FontSize.xs, color: Colors.gray[500], marginTop: 2 },
+    ingConsumo: { fontSize: FontSize.xs, color: Colors.gray[400], marginTop: 2 },
+    ingDireita: { alignItems: 'flex-end' },
+    ingProporcao: { fontSize: FontSize.lg, fontWeight: 'bold', color: Colors.primary },
+    ingCusto: { fontSize: FontSize.xs, color: Colors.gray[500], marginTop: 2 },
     balancoItem: { paddingVertical: Spacing.xs },
-    balancoHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 6,
-    },
-    balancoLabel: {
-        fontSize: FontSize.sm,
-        fontWeight: '600',
-        color: Colors.black,
-        flex: 1,
-    },
-    balancoBadge: {
-        paddingHorizontal: Spacing.sm,
-        paddingVertical: 2,
-        borderRadius: BorderRadius.full,
-    },
-    balancoBadgeText: {
-        fontSize: FontSize.xs,
-        fontWeight: 'bold',
-    },
-    balancoBar: {
-        height: 6,
-        backgroundColor: Colors.gray[200],
-        borderRadius: 3,
-        marginBottom: 4,
-        overflow: 'hidden',
-    },
+    balancoHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+    balancoLabel: { fontSize: FontSize.sm, fontWeight: '600', color: Colors.black, flex: 1 },
+    balancoBadge: { paddingHorizontal: Spacing.sm, paddingVertical: 2, borderRadius: BorderRadius.full },
+    balancoBadgeText: { fontSize: FontSize.xs, fontWeight: 'bold' },
+    balancoBar: { height: 6, backgroundColor: Colors.gray[200], borderRadius: 3, marginBottom: 4, overflow: 'hidden' },
     balancoFill: { height: '100%', borderRadius: 3 },
-    balancoValores: {
-        flexDirection: 'row',
-        alignItems: 'baseline',
-        gap: 4,
-    },
-    balancoFornecido: {
-        fontSize: FontSize.sm,
-        fontWeight: 'bold',
-        color: Colors.black,
-    },
-    balancoExigido: {
-        fontSize: FontSize.xs,
-        color: Colors.gray[500],
-    },
-    contratoCard: {
-        backgroundColor: Colors.white,
-        borderRadius: BorderRadius.lg,
-        padding: Spacing.md,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: Spacing.md,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-        elevation: 3,
-    },
-    contratoNome: {
-        fontSize: FontSize.md,
-        fontWeight: 'bold',
-        color: Colors.black,
-    },
-    contratoFazendeiro: {
-        fontSize: FontSize.sm,
-        color: Colors.gray[500],
-    },
-    contratoVer: {
-        fontSize: FontSize.sm,
-        color: Colors.primary,
-        fontWeight: '600',
-    },
-    semContrato: {
-        fontSize: FontSize.sm,
-        color: Colors.gray[500],
-        textAlign: 'center',
-        paddingVertical: Spacing.sm,
-    },
-    botaoEncerrar: {
-        backgroundColor: Colors.error,
-        paddingVertical: Spacing.md,
-        borderRadius: BorderRadius.md,
-        alignItems: 'center',
-    },
-    botaoEncerrarTexto: {
-        color: Colors.white,
-        fontSize: FontSize.lg,
-        fontWeight: 'bold',
-    },
-    botaoVincular: {
-        borderWidth: 1.5,
-        borderColor: Colors.primary,
-        borderRadius: BorderRadius.md,
-        paddingVertical: Spacing.md,
-        alignItems: 'center',
-        backgroundColor: Colors.white,
-    },
-    botaoVincularTexto: {
-        fontSize: FontSize.md,
-        fontWeight: '600',
-        color: Colors.primary,
-    },
-    contratoSelecioneLabel: {
-        fontSize: FontSize.md,
-        fontWeight: 'bold',
-        color: Colors.black,
-        marginBottom: Spacing.sm,
-    },
-    contratoOpcao: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: Spacing.sm,
-        gap: Spacing.md,
-    },
-    cancelarVincular: {
-        alignItems: 'center',
-        paddingVertical: Spacing.sm,
-        marginTop: Spacing.xs,
-    },
-    cancelarVincularTexto: {
-        fontSize: FontSize.sm,
-        color: Colors.error,
-        fontWeight: '600',
-    },
+    balancoValores: { flexDirection: 'row', alignItems: 'baseline', gap: 4 },
+    balancoFornecido: { fontSize: FontSize.sm, fontWeight: 'bold', color: Colors.black },
+    balancoExigido: { fontSize: FontSize.xs, color: Colors.gray[500] },
+    contratoCard: { backgroundColor: Colors.white, borderRadius: BorderRadius.lg, padding: Spacing.md, flexDirection: 'row', alignItems: 'center', gap: Spacing.md, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+    contratoNome: { fontSize: FontSize.md, fontWeight: 'bold', color: Colors.black },
+    contratoFazendeiro: { fontSize: FontSize.sm, color: Colors.gray[500] },
+    contratoVer: { fontSize: FontSize.sm, color: Colors.primary, fontWeight: '600' },
+    botaoVincular: { borderWidth: 1.5, borderColor: Colors.primary, borderRadius: BorderRadius.md, paddingVertical: Spacing.md, alignItems: 'center', backgroundColor: Colors.white },
+    botaoVincularTexto: { fontSize: FontSize.md, fontWeight: '600', color: Colors.primary },
+    contratoSelecioneLabel: { fontSize: FontSize.md, fontWeight: 'bold', color: Colors.black, marginBottom: Spacing.sm },
+    contratoOpcao: { flexDirection: 'row', alignItems: 'center', paddingVertical: Spacing.sm, gap: Spacing.md },
+    cancelarVincular: { alignItems: 'center', paddingVertical: Spacing.sm, marginTop: Spacing.xs },
+    cancelarVincularTexto: { fontSize: FontSize.sm, color: Colors.error, fontWeight: '600' },
+    botaoEncerrar: { backgroundColor: Colors.error, paddingVertical: Spacing.md, borderRadius: BorderRadius.md, alignItems: 'center' },
+    botaoEncerrarTexto: { color: Colors.white, fontSize: FontSize.lg, fontWeight: 'bold' },
 })

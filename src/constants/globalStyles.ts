@@ -56,6 +56,12 @@ export const globalStyles = StyleSheet.create({
     buttonDisabled: {
         opacity: 0.6,
     },
+    buttonRow: {
+        flexDirection: 'row' as const,
+        alignItems: 'center' as const,
+        justifyContent: 'center' as const,
+        gap: Spacing.sm,
+    },
 
     // ── Tipografia ────────────────────────────────────────────────────────────
     pageTitle: {

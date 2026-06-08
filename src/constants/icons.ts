@@ -11,6 +11,8 @@ import {
     PillBottle,
     CloudRain,
     CircleAlert,
+    CircleMinus,
+    CircleDotDashed,
     PawPrint,
     Scale,
     DollarSign,
@@ -20,6 +22,9 @@ import {
     FlaskConical,
     MilkOff,
     Clipboard,
+    TrendingUp,
+    ChartColumn,
+    FileText,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -35,6 +40,8 @@ export const Icons = {
     supplementation: PillBottle,
     forragem: CloudRain,
     circleAlert: CircleAlert,
+    circleMinus: CircleMinus,
+    circleDotDashed: CircleDotDashed,
     pawPrint: PawPrint,
     scale: Scale,
     dolar: DollarSign,
@@ -44,4 +51,7 @@ export const Icons = {
     flaskConical: FlaskConical,
     notFoundBottle: MilkOff,
     clipBoard: Clipboard,
+    trendingUp: TrendingUp,
+    graphic: ChartColumn,
+    fileText: FileText,
 }
