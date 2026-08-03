@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import {
     View,
     Text,
@@ -11,9 +11,9 @@ import {
     Image,
 } from 'react-native'
 import { router } from 'expo-router'
-import { useFocusEffect } from 'expo-router'
-import { Search, MapPin, Phone, ChevronRight } from 'lucide-react-native'
+import { Search, MapPin, ChevronRight } from 'lucide-react-native'
 import { buscarFazendeiros } from '../../src/services/buscaService'
+import BackButton from '../../src/components/Header/BackButton'
 import { FazendeiroPublico } from '../../src/types'
 import { Icons } from '../../src/constants/icons'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
@@ -25,6 +25,9 @@ const ESTADOS = [
     'RS','RO','RR','SC','SP','SE','TO',
 ]
 
+const MIN_CARACTERES = 2
+const DEBOUNCE_MS = 400
+
 export default function BuscaScreen() {
     const [username, setUsername] = useState('')
     const [estadoSelecionado, setEstadoSelecionado] = useState('Todos')
@@ -33,13 +36,32 @@ export default function BuscaScreen() {
     const [pagina, setPagina] = useState(1)
     const [totalPaginas, setTotalPaginas] = useState(1)
     const [buscou, setBuscou] = useState(false)
+    const [avisoMinimo, setAvisoMinimo] = useState(false)
 
-    async function buscar(novaPagina = 1) {
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    // Verifica se há critério válido para buscar
+    function temCriterioValido(user: string, estado: string): boolean {
+        return user.trim().length >= MIN_CARACTERES || estado !== 'Todos'
+    }
+
+    async function buscar(novaPagina = 1, userParam?: string, estadoParam?: string) {
+        const user = userParam !== undefined ? userParam : username
+        const estado = estadoParam !== undefined ? estadoParam : estadoSelecionado
+
+        if (!temCriterioValido(user, estado)) {
+            setAvisoMinimo(user.trim().length > 0 && user.trim().length < MIN_CARACTERES)
+            setFazendeiros([])
+            setBuscou(false)
+            return
+        }
+
+        setAvisoMinimo(false)
         setLoading(true)
         try {
             const resultado = await buscarFazendeiros({
-                username: username || undefined,
-                estado: estadoSelecionado !== 'Todos' ? estadoSelecionado : undefined,
+                username: user.trim().length >= MIN_CARACTERES ? user.trim() : undefined,
+                estado: estado !== 'Todos' ? estado : undefined,
                 page: novaPagina,
             })
             if (novaPagina === 1) {
@@ -57,15 +79,60 @@ export default function BuscaScreen() {
         }
     }
 
+    // Debounce na busca por username
+    function handleChangeUsername(texto: string) {
+        setUsername(texto)
+
+        if (debounceRef.current) {
+            clearTimeout(debounceRef.current)
+        }
+
+        // Se apagou tudo e não tem estado, limpa resultados
+        if (texto.trim().length === 0 && estadoSelecionado === 'Todos') {
+            setFazendeiros([])
+            setBuscou(false)
+            setAvisoMinimo(false)
+            return
+        }
+
+        // Mostra aviso se tem 1 caractere só
+        if (texto.trim().length > 0 && texto.trim().length < MIN_CARACTERES) {
+            setAvisoMinimo(true)
+            return
+        }
+
+        setAvisoMinimo(false)
+
+        debounceRef.current = setTimeout(() => {
+            buscar(1, texto, estadoSelecionado)
+        }, DEBOUNCE_MS)
+    }
+
+    // Selecionar estado dispara busca imediata
+    function handleSelecionarEstado(estado: string) {
+        setEstadoSelecionado(estado)
+
+        // Se voltou para "Todos" e não tem username válido, limpa
+        if (estado === 'Todos' && username.trim().length < MIN_CARACTERES) {
+            setFazendeiros([])
+            setBuscou(false)
+            return
+        }
+
+        buscar(1, username, estado)
+    }
+
+    // Limpa o timeout ao desmontar
+    useEffect(() => {
+        return () => {
+            if (debounceRef.current) clearTimeout(debounceRef.current)
+        }
+    }, [])
+
     function carregarMais() {
         if (pagina < totalPaginas && !loading) {
             buscar(pagina + 1)
         }
-    }
-
-    function abrirWhatsApp(whatsapp: string) {
-        const numero = whatsapp.replace(/\D/g, '')
-        Linking.openURL(`https://wa.me/55${numero}`)
     }
 
     function renderFazendeiro({ item }: { item: FazendeiroPublico }) {
@@ -75,14 +142,12 @@ export default function BuscaScreen() {
                 onPress={() => router.push(`/consultor/fazendeiro/${item.username}` as any)}
                 activeOpacity={0.8}
             >
-                {/* Avatar */}
                 <View style={styles.avatar}>
                     <Text style={styles.avatarText}>
                         {item.name.charAt(0).toUpperCase()}
                     </Text>
                 </View>
 
-                {/* Informações */}
                 <View style={styles.cardInfo}>
                     <Text style={styles.cardNome}>{item.name}</Text>
                     <Text style={styles.cardUsername}>@{item.username}</Text>
@@ -111,7 +176,11 @@ export default function BuscaScreen() {
     return (
         <View style={globalStyles.screen}>
 
-            {/* ── Cabeçalho ─────────────────────────── */}
+            <View style={styles.backButtonContainer}>
+                <BackButton />
+            </View>
+
+            {/* Cabeçalho */}
             <View style={styles.header}>
                 <Text style={globalStyles.pageTitle}>Buscar Fazendeiros</Text>
                 <Text style={globalStyles.pageSubtitle}>
@@ -119,10 +188,9 @@ export default function BuscaScreen() {
                 </Text>
             </View>
 
-            {/* ── Filtros ───────────────────────────── */}
+            {/* Filtros */}
             <View style={styles.filtros}>
 
-                {/* Input de busca */}
                 <View style={styles.searchContainer}>
                     <Search size={18} color={Colors.gray[400]} />
                     <TextInput
@@ -130,20 +198,25 @@ export default function BuscaScreen() {
                         placeholder="Buscar por @usuario"
                         placeholderTextColor={Colors.gray[400]}
                         value={username}
-                        onChangeText={setUsername}
+                        onChangeText={handleChangeUsername}
                         autoCapitalize="none"
                         autoCorrect={false}
                         returnKeyType="search"
-                        onSubmitEditing={() => buscar(1)}
                     />
                     {username.length > 0 && (
-                        <TouchableOpacity onPress={() => setUsername('')}>
+                        <TouchableOpacity onPress={() => handleChangeUsername('')}>
                             <Text style={styles.clearText}>✕</Text>
                         </TouchableOpacity>
                     )}
                 </View>
 
-                {/* Filtro de estado */}
+                {/* Aviso de mínimo de caracteres */}
+                {avisoMinimo && (
+                    <Text style={styles.avisoMinimo}>
+                        Digite ao menos {MIN_CARACTERES} caracteres para buscar
+                    </Text>
+                )}
+
                 <View style={styles.estadoContainer}>
                     <FlatList
                         data={ESTADOS}
@@ -157,7 +230,7 @@ export default function BuscaScreen() {
                                     styles.estadoChip,
                                     estadoSelecionado === item && styles.estadoChipAtivo,
                                 ]}
-                                onPress={() => setEstadoSelecionado(item)}
+                                onPress={() => handleSelecionarEstado(item)}
                                 activeOpacity={0.7}
                             >
                                 <Text style={[
@@ -170,23 +243,9 @@ export default function BuscaScreen() {
                         )}
                     />
                 </View>
-
-                {/* Botão buscar */}
-                <TouchableOpacity
-                    style={[globalStyles.buttonPrimary, loading && globalStyles.buttonDisabled]}
-                    onPress={() => buscar(1)}
-                    disabled={loading}
-                    activeOpacity={0.8}
-                >
-                    {loading && pagina === 1 ? (
-                        <ActivityIndicator color={Colors.white} />
-                    ) : (
-                        <Text style={globalStyles.buttonPrimaryText}>Buscar</Text>
-                    )}
-                </TouchableOpacity>
             </View>
 
-            {/* ── Resultados ────────────────────────── */}
+            {/* Resultados */}
             <FlatList
                 data={fazendeiros}
                 keyExtractor={item => item.id}
@@ -196,7 +255,11 @@ export default function BuscaScreen() {
                 onEndReached={carregarMais}
                 onEndReachedThreshold={0.3}
                 ListEmptyComponent={
-                    buscou && !loading ? (
+                    loading && pagina === 1 ? (
+                        <View style={styles.vazio}>
+                            <ActivityIndicator size="large" color={Colors.primary} />
+                        </View>
+                    ) : buscou && !loading ? (
                         <View style={styles.vazio}>
                             <Icons.circleAlert size={40} color="#FF0000" />
                             <Text style={styles.vazioTexto}>Nenhum fazendeiro encontrado</Text>
@@ -226,8 +289,11 @@ export default function BuscaScreen() {
 const styles = StyleSheet.create({
     header: {
         paddingHorizontal: Spacing.lg,
-        paddingTop: Spacing.lg,
         paddingBottom: Spacing.md,
+    },
+    backButtonContainer: {
+        paddingHorizontal: Spacing.lg,
+        paddingTop: Spacing.lg,
     },
     filtros: {
         paddingHorizontal: Spacing.lg,
@@ -254,6 +320,11 @@ const styles = StyleSheet.create({
         color: Colors.gray[400],
         fontSize: FontSize.md,
         paddingHorizontal: 4,
+    },
+    avisoMinimo: {
+        fontSize: FontSize.xs,
+        color: Colors.warning,
+        marginLeft: Spacing.xs,
     },
     estadoContainer: {
         marginHorizontal: -Spacing.lg,
@@ -345,9 +416,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: Spacing.xxl,
         gap: Spacing.sm,
-    },
-    vazioEmoji: {
-        fontSize: 48,
     },
     vazioTexto: {
         fontSize: FontSize.lg,
