@@ -36,7 +36,7 @@ export default function Login() {
                 visible: true,
                 title: 'Atenção',
                 message: 'Preencha email e senha.',
-                type: 'default',
+                type: 'error',
             })
             return
         }
@@ -135,6 +135,9 @@ export default function Login() {
                 title={modal.title}
                 message={modal.message}
                 type={modal.type}
+                dismissable
+                showCloseIcon
+                confirmText="Fechar"
                 onClose={() => setModal({ ...modal, visible: false })}
             />
         </KeyboardAvoidingView>

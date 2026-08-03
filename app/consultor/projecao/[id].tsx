@@ -30,6 +30,7 @@ export default function ProjecaoDetalheScreen() {
     const [projecao, setProjecao] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [gerandoPdf, setGerandoPdf] = useState(false)
+    const [excluindo, setExcluindo] = useState(false)
 
     const [contratosAtivos, setContratosAtivos] = useState<any[]>([])
     const [mostrarContratos, setMostrarContratos] = useState(false)
@@ -42,6 +43,7 @@ export default function ProjecaoDetalheScreen() {
         message: '',
         type: 'default' as 'default' | 'success' | 'error',
         onClose: undefined as (() => void) | undefined,
+        onConfirm: undefined as (() => void) | undefined,
     })
 
     useFocusEffect(
@@ -62,6 +64,7 @@ export default function ProjecaoDetalheScreen() {
                 message: 'Não foi possível carregar a projeção.',
                 type: 'error',
                 onClose: () => router.back(),
+                onConfirm: undefined,
             })
         } finally {
             setLoading(false)
@@ -124,22 +127,48 @@ export default function ProjecaoDetalheScreen() {
             } else {
                 setModal({
                     visible: true,
-                    title: 'PDF gerado!',
-                    message: `O PDF foi salvo em: ${uri}`,
-                    type: 'success',
-                    onClose: undefined,
+                    title: 'Erro',
+                    message: 'Não foi possível carregar a projeção.',
+                    type: 'error',
+                    onClose: () => router.back(),
+                    onConfirm: undefined,
                 })
             }
         } catch {
             setModal({
                 visible: true,
                 title: 'Erro',
-                message: 'Não foi possível gerar o PDF.',
+                message: 'Não foi possível carregar a projeção.',
                 type: 'error',
-                onClose: undefined,
+                onClose: () => router.back(),
+                onConfirm: undefined,
             })
         } finally {
             setGerandoPdf(false)
+        }
+    }
+
+    function handleExcluir() {
+        setModal({
+            visible: true,
+            title: 'Excluir projeção',
+            message: 'Tem certeza que deseja excluir esta projeção?\nEsta ação não pode ser desfeita.',
+            type: 'error',
+            onClose: undefined,
+            onConfirm: confirmarExclusao,
+        })
+    }
+
+    async function confirmarExclusao() {
+        setExcluindo(true)
+        try {
+            await api.delete(`/projecoes/${id}`)
+            toastSucesso('Projeção excluída com sucesso.')
+            router.replace('/consultor/projecao' as any)
+        } catch (error: any) {
+            toastErro(error.response?.data?.message || 'Erro ao excluir projeção.')
+        } finally {
+            setExcluindo(false)
         }
     }
 
@@ -379,6 +408,22 @@ export default function ProjecaoDetalheScreen() {
                             </View>
                         )}
                     </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.botaoExcluir, excluindo && globalStyles.buttonDisabled, { marginTop: Spacing.sm }]}
+                        onPress={handleExcluir}
+                        disabled={excluindo}
+                        activeOpacity={0.8}
+                    >
+                        {excluindo ? (
+                            <ActivityIndicator color={Colors.white} />
+                        ) : (
+                            <View style={globalStyles.buttonRow}>
+                                <Icons.trash size={20} color={Colors.white} />
+                                <Text style={styles.botaoExcluirTexto}>Excluir projeção</Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
                 </View>
 
             </ScrollView>
@@ -388,9 +433,20 @@ export default function ProjecaoDetalheScreen() {
                 title={modal.title}
                 message={modal.message}
                 type={modal.type}
+                dismissable
+                showCloseIcon
+                confirmText={modal.onConfirm ? 'Sim' : 'OK'}
+                cancelText="Não"
+                confirmColor={modal.onConfirm ? '#16a34a' : undefined}
+                cancelColor="#dc2626"
+                onConfirm={modal.onConfirm ? () => {
+                    const fn = modal.onConfirm
+                    setModal({ ...modal, visible: false, onClose: undefined, onConfirm: undefined })
+                    fn?.()
+                } : undefined}
                 onClose={() => {
                     const fn = modal.onClose
-                    setModal({ ...modal, visible: false, onClose: undefined })
+                    setModal({ ...modal, visible: false, onClose: undefined, onConfirm: undefined })
                     fn?.()
                 }}
             />
@@ -561,5 +617,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingVertical: Spacing.sm,
+    },
+    botaoExcluir: {
+        backgroundColor: Colors.error,
+        paddingVertical: Spacing.md,
+        borderRadius: BorderRadius.md,
+        alignItems: 'center',
+    },
+    botaoExcluirTexto: {
+        color: Colors.white,
+        fontSize: FontSize.lg,
+        fontWeight: 'bold',
     },
 })

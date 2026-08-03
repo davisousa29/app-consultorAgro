@@ -3,8 +3,10 @@ import {
     View,
     Text,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     StyleSheet,
 } from 'react-native'
+import { X } from 'lucide-react-native'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
 
 interface Props {
@@ -16,6 +18,12 @@ interface Props {
     confirmText?: string
     cancelText?: string
     type?: 'default' | 'success' | 'error'
+    // Novos parâmetros opcionais (não quebram telas existentes)
+    dismissable?: boolean          // fecha ao clicar fora — padrão false p/ retrocompatibilidade
+    showCloseIcon?: boolean         // exibe o X no topo — padrão false
+    onCancel?: () => void           // ação do botão cancelar/não (se ausente, usa onClose)
+    confirmColor?: string           // cor custom do botão confirmar
+    cancelColor?: string            // cor custom do botão cancelar
 }
 
 export default function CentralModal({
@@ -27,72 +35,90 @@ export default function CentralModal({
                                          confirmText = 'OK',
                                          cancelText = 'Cancelar',
                                          type = 'default',
+                                         dismissable = false,
+                                         showCloseIcon = false,
+                                         onCancel,
+                                         confirmColor,
+                                         cancelColor,
                                      }: Props) {
 
     const getColor = () => {
         switch (type) {
-            case 'success':
-                return '#16a34a'
-            case 'error':
-                return '#dc2626'
-            default:
-                return Colors.primary
+            case 'success': return '#16a34a'
+            case 'error':   return '#dc2626'
+            default:        return Colors.primary
         }
     }
+
+    // O botão cancelar/X/fora sempre usa onCancel se existir, senão onClose.
+    // Isso NUNCA dispara onConfirm — a ação destrutiva só ocorre no botão confirmar.
+    const handleCancel = onCancel ?? onClose
 
     return (
         <Modal
             transparent
             visible={visible}
             animationType="fade"
+            onRequestClose={handleCancel}
         >
-            <View style={styles.overlay}>
-                <View style={styles.container}>
+            <TouchableWithoutFeedback onPress={dismissable ? handleCancel : undefined}>
+                <View style={styles.overlay}>
+                    <TouchableWithoutFeedback onPress={() => {}}>
+                        <View style={styles.container}>
 
-                    {/* Header (linha colorida) */}
-                    <View style={[styles.topBar, { backgroundColor: getColor() }]} />
+                            {/* Header (linha colorida) */}
+                            <View style={[
+                                styles.topBar,
+                                { backgroundColor: getColor() },
+                                showCloseIcon && styles.topBarWithClose,
+                            ]} />
 
-                    {/* Conteúdo */}
-                    {title && <Text style={styles.title}>{title}</Text>}
-                    {message && <Text style={styles.message}>{message}</Text>}
-
-                    {/* Botões */}
-                    <View style={styles.actions}>
-
-                        {onConfirm ? (
-                            <>
+                            {/* Botão X (opcional) */}
+                            {showCloseIcon && (
                                 <TouchableOpacity
-                                    style={styles.buttonSecondary}
-                                    onPress={onClose}
+                                    style={styles.closeButton}
+                                    onPress={handleCancel}
+                                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                                 >
-                                    <Text style={styles.buttonSecondaryText}>
-                                        {cancelText}
-                                    </Text>
+                                    <X size={20} color={Colors.gray[500]} />
                                 </TouchableOpacity>
+                            )}
 
-                                <TouchableOpacity
-                                    style={[styles.buttonPrimary, { backgroundColor: getColor() }]}
-                                    onPress={onConfirm}
-                                >
-                                    <Text style={styles.buttonPrimaryText}>
-                                        {confirmText}
-                                    </Text>
-                                </TouchableOpacity>
-                            </>
-                        ) : (
-                            <TouchableOpacity
-                                style={[styles.buttonPrimary, { backgroundColor: getColor() }]}
-                                onPress={onClose}
-                            >
-                                <Text style={styles.buttonPrimaryText}>
-                                    {confirmText}
-                                </Text>
-                            </TouchableOpacity>
-                        )}
+                            {/* Conteúdo */}
+                            {title && <Text style={styles.title}>{title}</Text>}
+                            {message && <Text style={styles.message}>{message}</Text>}
 
-                    </View>
+                            {/* Botões */}
+                            <View style={styles.actions}>
+                                {onConfirm ? (
+                                    <>
+                                        <TouchableOpacity
+                                            style={[styles.buttonPrimary, { backgroundColor: cancelColor ?? Colors.gray[400] }]}
+                                            onPress={handleCancel}
+                                        >
+                                            <Text style={styles.buttonPrimaryText}>{cancelText}</Text>
+                                        </TouchableOpacity>
+
+                                        <TouchableOpacity
+                                            style={[styles.buttonPrimary, { backgroundColor: confirmColor ?? getColor() }]}
+                                            onPress={onConfirm}
+                                        >
+                                            <Text style={styles.buttonPrimaryText}>{confirmText}</Text>
+                                        </TouchableOpacity>
+                                    </>
+                                ) : (
+                                    <TouchableOpacity
+                                        style={[styles.buttonPrimary, { backgroundColor: getColor() }]}
+                                        onPress={onClose}
+                                    >
+                                        <Text style={styles.buttonPrimaryText}>{confirmText}</Text>
+                                    </TouchableOpacity>
+                                )}
+                            </View>
+                        </View>
+                    </TouchableWithoutFeedback>
                 </View>
-            </View>
+            </TouchableWithoutFeedback>
         </Modal>
     )
 }
@@ -120,6 +146,21 @@ const styles = StyleSheet.create({
         height: 4,
         borderRadius: 2,
         marginBottom: Spacing.md,
+    },
+    topBarWithClose: {
+        marginRight: 44,
+    },
+    closeButton: {
+        position: 'absolute',
+        top: Spacing.md,
+        right: Spacing.md,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: Colors.gray[100],
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
     },
     title: {
         fontSize: FontSize.lg,

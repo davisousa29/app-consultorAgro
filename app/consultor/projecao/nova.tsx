@@ -143,17 +143,17 @@ export default function NovaProjecaoScreen() {
 
     async function handleSalvar() {
         if (!nome.trim()) {
-            setModal({ visible: true, title: 'Atenção', message: 'Informe o nome da projeção.', type: 'default', onClose: undefined })
+            setModal({ visible: true, title: 'Atenção', message: 'Informe o nome da projeção.', type: 'error', onClose: undefined })
             return
         }
         if (!preco || preco <= 0) {
-            setModal({ visible: true, title: 'Atenção', message: 'Informe o preço unitário.', type: 'default', onClose: undefined })
+            setModal({ visible: true, title: 'Atenção', message: 'Informe o preço unitário.', type: 'error', onClose: undefined })
             return
         }
         if (modalidade !== 'cabeca') {
             const semPeso = animais.some(a => !a.peso_kg || parsearNumero(a.peso_kg) <= 0)
             if (semPeso) {
-                setModal({ visible: true, title: 'Atenção', message: 'Informe o peso de todos os animais.', type: 'default', onClose: undefined })
+                setModal({ visible: true, title: 'Atenção', message: 'Informe o peso de todos os animais.', type: 'error', onClose: undefined })
                 return
             }
         }

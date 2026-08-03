@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import {
     View,
     Text,
@@ -8,11 +8,29 @@ import {
     ActivityIndicator,
 } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
-import { TrendingUp, ChevronRight, Plus } from 'lucide-react-native'
+import { TrendingUp, ChevronRight } from 'lucide-react-native'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
 import { globalStyles } from '../../../src/constants/globalStyles'
 import { Icons } from '../../../src/constants/icons'
+import SearchBar from '../../../src/components/SearchBar'
+import FilterModal, { FilterGroup } from '../../../src/components/FilterModal'
+import BackButton from '../../../src/components/Header/BackButton'
+import { FilterChip } from '../../../src/components/FilterChips'
 import api from '../../../src/services/api'
+
+interface Projecao {
+    id: string
+    nome: string
+    modalidade: string
+    total_animais: number
+    valor_total: string
+    contrato_id: string | null
+    created_at: string
+    contrato: {
+        fazenda: { name: string } | null
+        fazendeiro: { username: string } | null
+    } | null
+}
 
 const MODALIDADE_LABEL: Record<string, string> = {
     arroba: 'Arroba (@)',
@@ -20,9 +38,33 @@ const MODALIDADE_LABEL: Record<string, string> = {
     cabeca: 'Cabeça',
 }
 
+const MODALIDADE_CHIPS: FilterChip[] = [
+    { label: 'Todos',      value: 'todos' },
+    { label: 'Arroba (@)', value: 'arroba' },
+    { label: 'Kg vivo',    value: 'kg' },
+    { label: 'Cabeça',     value: 'cabeca' },
+]
+
+const VINCULO_CHIPS: FilterChip[] = [
+    { label: 'Todos',        value: 'todos' },
+    { label: 'Com contrato', value: 'com_contrato',  cor: Colors.primary },
+    { label: 'Sem contrato', value: 'sem_contrato',  cor: '#6C757D' },
+]
+
+const ORDEM_CHIPS: FilterChip[] = [
+    { label: 'Mais recentes', value: 'recentes' },
+    { label: 'Mais antigos',  value: 'antigos' },
+    { label: 'Maior valor',   value: 'maior_valor' },
+    { label: 'Menor valor',   value: 'menor_valor' },
+]
+
 export default function ProjecoesScreen() {
-    const [projecoes, setProjecoes] = useState<any[]>([])
+    const [projecoes, setProjecoes] = useState<Projecao[]>([])
     const [loading, setLoading] = useState(true)
+    const [busca, setBusca] = useState('')
+    const [modalidadeFiltro, setModalidadeFiltro] = useState('todos')
+    const [vinculoFiltro, setVinculoFiltro] = useState('todos')
+    const [ordem, setOrdem] = useState('recentes')
 
     useFocusEffect(
         useCallback(() => {
@@ -42,8 +84,69 @@ export default function ProjecoesScreen() {
         }
     }
 
+    const projecoesFiltradas = useMemo(() => {
+        let resultado = [...projecoes]
+
+        if (busca.trim()) {
+            const termo = busca.toLowerCase()
+            resultado = resultado.filter(p => p.nome.toLowerCase().includes(termo))
+        }
+
+        if (modalidadeFiltro !== 'todos') {
+            resultado = resultado.filter(p => p.modalidade === modalidadeFiltro)
+        }
+
+        if (vinculoFiltro === 'com_contrato') {
+            resultado = resultado.filter(p => p.contrato_id !== null)
+        } else if (vinculoFiltro === 'sem_contrato') {
+            resultado = resultado.filter(p => p.contrato_id === null)
+        }
+
+        resultado.sort((a, b) => {
+            if (ordem === 'recentes') return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            if (ordem === 'antigos')  return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+            if (ordem === 'maior_valor') return Number(b.valor_total) - Number(a.valor_total)
+            if (ordem === 'menor_valor') return Number(a.valor_total) - Number(b.valor_total)
+            return 0
+        })
+
+        return resultado
+    }, [projecoes, busca, modalidadeFiltro, vinculoFiltro, ordem])
+
     function formatarData(data: string): string {
         return new Date(data).toLocaleDateString('pt-BR')
+    }
+
+    function renderProjecao({ item }: { item: Projecao }) {
+        return (
+            <TouchableOpacity
+                style={styles.card}
+                onPress={() => router.push(`/consultor/projecao/${item.id}` as any)}
+                activeOpacity={0.8}
+            >
+                <View style={styles.cardIcone}>
+                    <TrendingUp size={22} color={Colors.primary} />
+                </View>
+                <View style={styles.cardInfo}>
+                    <Text style={styles.cardNome} numberOfLines={1}>{item.nome}</Text>
+                    <Text style={styles.cardDetalhe}>
+                        {item.total_animais} anim{item.total_animais !== 1 ? 'ais' : 'al'} · {MODALIDADE_LABEL[item.modalidade] ?? item.modalidade}
+                    </Text>
+                    <View style={styles.cardRodape}>
+                        <Text style={styles.cardValor}>
+                            R$ {Number(item.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </Text>
+                        <Text style={styles.cardData}>{formatarData(item.created_at)}</Text>
+                    </View>
+                    {item.contrato && (
+                        <Text style={styles.cardContrato} numberOfLines={1}>
+                            {item.contrato.fazenda?.name ?? '—'} · @{item.contrato.fazendeiro?.username ?? '—'}
+                        </Text>
+                    )}
+                </View>
+                <ChevronRight size={18} color={Colors.gray[400]} />
+            </TouchableOpacity>
+        )
     }
 
     if (loading) {
@@ -57,16 +160,56 @@ export default function ProjecoesScreen() {
     return (
         <View style={globalStyles.screen}>
             <FlatList
-                data={projecoes}
+                data={projecoesFiltradas}
                 keyExtractor={item => item.id}
+                renderItem={renderProjecao}
                 contentContainerStyle={styles.lista}
                 showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
                 ListHeaderComponent={
                     <View style={styles.header}>
+                        <BackButton />
+
                         <Text style={globalStyles.pageTitle}>Projeções de Venda</Text>
                         <Text style={globalStyles.pageSubtitle}>
-                            {projecoes.length} projeção{projecoes.length !== 1 ? 'ões' : ''} encontrada{projecoes.length !== 1 ? 's' : ''}
+                            {projecoesFiltradas.length} projeção{projecoesFiltradas.length !== 1 ? 'ões' : ''} encontrada{projecoesFiltradas.length !== 1 ? 's' : ''}
                         </Text>
+
+                        <View style={styles.filtrosRow}>
+                            <SearchBar
+                                value={busca}
+                                onChange={setBusca}
+                                placeholder="Buscar por nome da projeção..."
+                            />
+                            <FilterModal
+                                grupos={[
+                                    {
+                                        label: 'Modalidade',
+                                        chips: MODALIDADE_CHIPS,
+                                        valor: modalidadeFiltro,
+                                        onChange: setModalidadeFiltro,
+                                    },
+                                    {
+                                        label: 'Vínculo',
+                                        chips: VINCULO_CHIPS,
+                                        valor: vinculoFiltro,
+                                        onChange: setVinculoFiltro,
+                                    },
+                                    {
+                                        label: 'Ordenar por',
+                                        chips: ORDEM_CHIPS,
+                                        valor: ordem,
+                                        onChange: setOrdem,
+                                    },
+                                ] as FilterGroup[]}
+                                onLimpar={() => {
+                                    setModalidadeFiltro('todos')
+                                    setVinculoFiltro('todos')
+                                    setOrdem('recentes')
+                                }}
+                            />
+                        </View>
+
                         <TouchableOpacity
                             style={[globalStyles.buttonPrimary, { marginTop: Spacing.md }]}
                             onPress={() => router.push('/consultor/projecao/nova' as any)}
@@ -76,50 +219,19 @@ export default function ProjecoesScreen() {
                         </TouchableOpacity>
                     </View>
                 }
-                renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.card}
-                        onPress={() => router.push(`/consultor/projecao/${item.id}` as any)}
-                        activeOpacity={0.8}
-                    >
-                        <View style={styles.cardIcone}>
-                            <TrendingUp size={22} color={Colors.primary} />
-                        </View>
-                        <View style={styles.cardInfo}>
-                            <Text style={styles.cardNome} numberOfLines={1}>{item.nome}</Text>
-                            <Text style={styles.cardDetalhe}>
-                                {item.total_animais} animal{item.total_animais !== 1 ? 'is' : ''} · {MODALIDADE_LABEL[item.modalidade] ?? item.modalidade}
-                            </Text>
-                            <View style={styles.cardRodape}>
-                                <Text style={styles.cardValor}>
-                                    R$ {Number(item.valor_total).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                                </Text>
-                                <Text style={styles.cardData}>{formatarData(item.created_at)}</Text>
-                            </View>
-                            {item.contrato && (
-                                <Text style={styles.cardContrato}>
-                                    <Icons.clipBoard size={25} color={Colors.primary} />
-                                     {item.contrato.fazenda?.name ?? '—'}
-                                </Text>
-                            )}
-                        </View>
-                        <ChevronRight size={18} color={Colors.gray[400]} />
-                    </TouchableOpacity>
-                )}
                 ListEmptyComponent={
                     <View style={styles.vazio}>
-                        <Icons.graphic size={25} color={Colors.primary} />
-                        <Text style={styles.vazioTexto}>Nenhuma projeção ainda</Text>
-                        <Text style={styles.vazioSubtexto}>
-                            Crie sua primeira projeção de venda
+                        <Icons.trendingUp size={40} color={Colors.gray[400]} />
+                        <Text style={styles.vazioTexto}>
+                            {busca || modalidadeFiltro !== 'todos' || vinculoFiltro !== 'todos'
+                                ? 'Nenhuma projeção encontrada'
+                                : 'Nenhuma projeção ainda'}
                         </Text>
-                        <TouchableOpacity
-                            style={[globalStyles.buttonPrimary, { marginTop: Spacing.lg }]}
-                            onPress={() => router.push('/consultor/projecao/nova' as any)}
-                            activeOpacity={0.8}
-                        >
-                            <Text style={globalStyles.buttonPrimaryText}>+ Nova projeção</Text>
-                        </TouchableOpacity>
+                        <Text style={styles.vazioSubtexto}>
+                            {busca || modalidadeFiltro !== 'todos' || vinculoFiltro !== 'todos'
+                                ? 'Tente outros filtros'
+                                : 'Crie sua primeira projeção de venda'}
+                        </Text>
                     </View>
                 }
             />
@@ -130,7 +242,11 @@ export default function ProjecoesScreen() {
 const styles = StyleSheet.create({
     header: {
         paddingTop: Spacing.lg,
-        paddingBottom: Spacing.md,
+        paddingBottom: Spacing.sm,
+    },
+    filtrosRow: {
+        gap: Spacing.sm,
+        marginTop: Spacing.md,
     },
     lista: {
         paddingHorizontal: Spacing.lg,
@@ -193,9 +309,9 @@ const styles = StyleSheet.create({
     vazio: {
         alignItems: 'center',
         paddingVertical: Spacing.xxl,
+        paddingHorizontal: Spacing.lg,
         gap: Spacing.sm,
     },
-    vazioEmoji: { fontSize: 48 },
     vazioTexto: {
         fontSize: FontSize.lg,
         fontWeight: 'bold',

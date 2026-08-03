@@ -11,6 +11,7 @@ import {
 import { SlidersHorizontal, X } from 'lucide-react-native'
 import { Colors, Spacing, FontSize, BorderRadius } from '../constants'
 import FilterChips, { FilterChip } from './FilterChips'
+import { Icons } from '../constants/icons'
 
 export interface FilterGroup {
     label: string
@@ -112,17 +113,8 @@ export default function FilterModal({ grupos, onLimpar }: Props) {
                                 onPress={handleLimpar}
                                 activeOpacity={0.8}
                             >
-                                <Text style={styles.botaoLimparTexto}>Limpar tudo</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={styles.botaoAplicar}
-                                onPress={() => setVisivel(false)}
-                                activeOpacity={0.8}
-                            >
-                                <Text style={styles.botaoAplicarTexto}>
-                                    {ativos > 0 ? `Aplicar (${ativos})` : 'Fechar'}
-                                </Text>
+                                <Icons.brushCleaning size={20} color={Colors.error} />
+                                <Text style={styles.botaoLimparTexto}>Limpar filtro</Text>
                             </TouchableOpacity>
                         </View>
                     </SafeAreaView>
@@ -228,34 +220,25 @@ const styles = StyleSheet.create({
     },
     rodape: {
         flexDirection: 'row',
-        gap: Spacing.sm,
         padding: Spacing.lg,
         borderTopWidth: 1,
         borderTopColor: Colors.gray[200],
     },
     botaoLimpar: {
         flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: Spacing.sm,
         paddingVertical: Spacing.md,
         borderRadius: BorderRadius.md,
         borderWidth: 1.5,
-        borderColor: Colors.gray[300],
-        alignItems: 'center',
+        borderColor: Colors.error,
+        backgroundColor: '#FFF5F5',
     },
     botaoLimparTexto: {
         fontSize: FontSize.md,
-        fontWeight: '600',
-        color: Colors.gray[600],
-    },
-    botaoAplicar: {
-        flex: 2,
-        paddingVertical: Spacing.md,
-        borderRadius: BorderRadius.md,
-        backgroundColor: Colors.primary,
-        alignItems: 'center',
-    },
-    botaoAplicarTexto: {
-        fontSize: FontSize.md,
         fontWeight: 'bold',
-        color: Colors.white,
+        color: Colors.error,
     },
 })

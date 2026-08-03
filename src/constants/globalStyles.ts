@@ -38,6 +38,7 @@ export const globalStyles = StyleSheet.create({
         color: Colors.white,
         fontSize: FontSize.lg,
         fontWeight: 'bold' as const,
+        paddingHorizontal: Spacing.md,
     },
     buttonSecondary: {
         backgroundColor: Colors.white,

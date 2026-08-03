@@ -25,6 +25,8 @@ import {
     TrendingUp,
     ChartColumn,
     FileText,
+    BrushCleaning,
+    Trash2,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -54,4 +56,6 @@ export const Icons = {
     trendingUp: TrendingUp,
     graphic: ChartColumn,
     fileText: FileText,
+    brushCleaning: BrushCleaning,
+    trash: Trash2,
 }
