@@ -15,6 +15,8 @@ import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
 import { globalStyles } from '../../src/constants/globalStyles'
 import SearchBar from '../../src/components/SearchBar'
 import FilterChips, { FilterChip } from '../../src/components/FilterChips'
+import { Icons } from '../../src/constants/icons'
+import BackButton from '../../src/components/Header/BackButton'
 
 const STATUS_CHIPS: FilterChip[] = [
     { label: 'Todos',     value: 'todos' },
@@ -156,6 +158,10 @@ export default function ContratosScreen() {
     return (
         <View style={globalStyles.screen}>
 
+            <View style={globalStyles.backButtonContainer}>
+                <BackButton />
+            </View>
+
             {/* ── Cabeçalho ─────────────────────────── */}
             <View style={styles.header}>
                 <Text style={globalStyles.pageTitle}>Contratos</Text>
@@ -194,7 +200,7 @@ export default function ContratosScreen() {
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={
                     <View style={styles.vazio}>
-                        <Text style={styles.vazioEmoji}>📋</Text>
+                        <Icons.clipBoard size={40} color={Colors.gray[400]} />
                         <Text style={styles.vazioTexto}>
                             {busca || statusFiltro !== 'todos'
                                 ? 'Nenhum contrato encontrado'
@@ -223,7 +229,6 @@ export default function ContratosScreen() {
 const styles = StyleSheet.create({
     header: {
         paddingHorizontal: Spacing.lg,
-        paddingTop: Spacing.lg,
         paddingBottom: Spacing.sm,
     },
     filtros: {

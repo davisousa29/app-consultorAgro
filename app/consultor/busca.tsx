@@ -176,7 +176,7 @@ export default function BuscaScreen() {
     return (
         <View style={globalStyles.screen}>
 
-            <View style={styles.backButtonContainer}>
+            <View style={globalStyles.backButtonContainer}>
                 <BackButton />
             </View>
 
@@ -290,10 +290,6 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: Spacing.lg,
         paddingBottom: Spacing.md,
-    },
-    backButtonContainer: {
-        paddingHorizontal: Spacing.lg,
-        paddingTop: Spacing.lg,
     },
     filtros: {
         paddingHorizontal: Spacing.lg,

@@ -16,6 +16,7 @@ import SearchBar from '../../../src/components/SearchBar'
 import FilterChips, { FilterChip } from '../../../src/components/FilterChips'
 import FilterModal, { FilterGroup } from '../../../src/components/FilterModal'
 import api from '../../../src/services/api'
+import BackButton from "../../../src/components/Header/BackButton";
 
 interface ProgramaRacao {
     id: string
@@ -210,6 +211,11 @@ export default function FormulacoesScreen() {
 
     return (
         <View style={globalStyles.screen}>
+
+            <View style={globalStyles.backButtonContainer}>
+                <BackButton />
+            </View>
+
             <FlatList
                 data={programasFiltrados}
                 keyExtractor={item => item.id}
@@ -297,7 +303,6 @@ export default function FormulacoesScreen() {
 
 const styles = StyleSheet.create({
     header: {
-        paddingTop: Spacing.lg,
         paddingBottom: Spacing.sm,
     },
     filtrosRow: {

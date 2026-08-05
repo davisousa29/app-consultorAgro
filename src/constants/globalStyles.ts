@@ -127,7 +127,11 @@ export const globalStyles = StyleSheet.create({
         elevation: 3,
     },
 
-    // ── Navegação ─────────────────────────────────────────────────────────────
+// ── Navegação ─────────────────────────────────────────────────────────────
+    backButtonContainer: {
+        paddingHorizontal: Spacing.lg,
+        paddingTop: Spacing.lg,
+    },
     backButton: {
         marginBottom: Spacing.lg,
     },

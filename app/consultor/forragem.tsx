@@ -16,10 +16,10 @@ import {
 import * as Location from 'expo-location'
 import { LineChart, BarChart } from 'react-native-chart-kit'
 import { Trash2, BrushCleaning, Info } from 'lucide-react-native'
-
 import { buscarClimaAnual, ClimaMensal } from '../../src/services/climaService'
 import { Colors, Spacing, BorderRadius, FontSize } from '../../src/constants'
 import { globalStyles } from '../../src/constants/globalStyles'
+import BackButton from "../../src/components/Header/BackButton";
 
 const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
 const screenWidth = Dimensions.get('window').width - Spacing.lg * 2
@@ -167,6 +167,8 @@ export default function ForragemScreen() {
                 contentContainerStyle={[globalStyles.scrollContent, { paddingBottom: 120 }]}
                 keyboardShouldPersistTaps="handled"
             >
+                <BackButton />
+
                 {/* ── Header ───────────────────────────── */}
                 <View style={styles.header}>
                     <View style={styles.headerTop}>
