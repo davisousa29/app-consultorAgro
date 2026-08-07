@@ -67,6 +67,7 @@ export default function ContratoDetalheScreen() {
         message: '',
         type: 'default' as 'default' | 'success' | 'error',
         onClose: undefined as (() => void) | undefined,
+        onConfirm: undefined as (() => void) | undefined,
     })
 
     useFocusEffect(
@@ -83,10 +84,11 @@ export default function ContratoDetalheScreen() {
         } catch {
             setModal({
                 visible: true,
-                title: 'Erro',
-                message: 'Não foi possível carregar o contrato.',
-                type: 'error',
-                onClose: () => router.back(),
+                title: 'Contrato encerrado',
+                message: 'O contrato foi encerrado com sucesso.',
+                type: 'success',
+                onClose: () => carregarContrato(),
+                onConfirm: undefined,
             })
         } finally {
             setLoading(false)
@@ -97,9 +99,10 @@ export default function ContratoDetalheScreen() {
         setModal({
             visible: true,
             title: 'Encerrar contrato',
-            message: 'Tem certeza que deseja encerrar este contrato? Esta ação não pode ser desfeita.',
-            type: 'default',
-            onClose: confirmarEncerramento,
+            message: 'Tem certeza que deseja encerrar este contrato?\nEsta ação não pode ser desfeita.',
+            type: 'error',
+            onClose: undefined,
+            onConfirm: confirmarEncerramento,
         })
     }
 
@@ -113,14 +116,16 @@ export default function ContratoDetalheScreen() {
                 message: 'O contrato foi encerrado com sucesso.',
                 type: 'success',
                 onClose: () => carregarContrato(),
+                onConfirm: undefined,
             })
         } catch (error: any) {
             setModal({
                 visible: true,
-                title: 'Erro',
-                message: error.response?.data?.message || 'Erro ao encerrar contrato.',
-                type: 'error',
-                onClose: undefined,
+                title: 'Contrato encerrado',
+                message: 'O contrato foi encerrado com sucesso.',
+                type: 'success',
+                onClose: () => carregarContrato(),
+                onConfirm: undefined,
             })
         } finally {
             setLoadingAcao(false)
@@ -235,8 +240,9 @@ export default function ContratoDetalheScreen() {
                                 visible: true,
                                 title: 'Cancelar proposta',
                                 message: 'Deseja cancelar esta proposta de contrato?',
-                                type: 'default',
-                                onClose: confirmarEncerramento,
+                                type: 'error',
+                                onClose: undefined,
+                                onConfirm: confirmarEncerramento,
                             })}
                             disabled={loadingAcao}
                             activeOpacity={0.8}
@@ -257,9 +263,20 @@ export default function ContratoDetalheScreen() {
                 title={modal.title}
                 message={modal.message}
                 type={modal.type}
+                dismissable
+                showCloseIcon
+                confirmText={modal.onConfirm ? 'Sim' : 'OK'}
+                cancelText="Fechar"
+                confirmColor={modal.onConfirm ? '#16a34a' : undefined}
+                cancelColor="#dc2626"
+                onConfirm={modal.onConfirm ? () => {
+                    const fn = modal.onConfirm
+                    setModal({ ...modal, visible: false, onClose: undefined, onConfirm: undefined })
+                    fn?.()
+                } : undefined}
                 onClose={() => {
                     const fn = modal.onClose
-                    setModal({ ...modal, visible: false, onClose: undefined })
+                    setModal({ ...modal, visible: false, onClose: undefined, onConfirm: undefined })
                     fn?.()
                 }}
             />

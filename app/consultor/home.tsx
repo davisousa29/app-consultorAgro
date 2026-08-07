@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import { useEffect } from 'react'
-import { router } from 'expo-router'
+import { useEffect, useCallback } from 'react'
+import { router, useFocusEffect } from 'expo-router'
+import { useNotificacaoStore } from '../../src/store/notificacaoStore'
 import { useAuthStore } from '../../src/store/authStore'
 import api from '../../src/services/api'
 import { Colors, FontSize, Spacing } from '../../src/constants'
@@ -10,6 +11,14 @@ import QuickShortcuts from '../../src/components/QuickShortcuts/QuickShortcuts'
 export default function Home() {
 
     const { user, profile, setProfile } = useAuthStore()
+    const { atualizarNaoLidas } = useNotificacaoStore()
+
+    // Atualiza o badge sempre que a home ganha foco
+    useFocusEffect(
+        useCallback(() => {
+            atualizarNaoLidas()
+        }, [])
+    )
 
     useEffect(() => {
         async function loadProfile() {

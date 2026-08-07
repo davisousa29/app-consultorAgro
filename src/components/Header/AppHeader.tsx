@@ -1,9 +1,11 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useNotificacaoStore } from '../../store/notificacaoStore'
 import { router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
 import { Icons } from '../../constants/icons'
+import NotificationDropdown from './NotificationDropdown'
 import { globalStyles } from '../../constants/globalStyles'
 import ProfileDropdown from './ProfileDropdown'
 import SideMenu from '../Menu/SideMenu'
@@ -11,6 +13,12 @@ import SideMenu from '../Menu/SideMenu'
 export default function AppHeader() {
     const [dropdownVisible, setDropdownVisible] = useState(false)
     const [menuVisible, setMenuVisible] = useState(false)
+    const { naoLidas, atualizarNaoLidas } = useNotificacaoStore()
+    const [notifVisible, setNotifVisible] = useState(false)
+
+    useEffect(() => {
+        atualizarNaoLidas()
+    }, [])
 
     return (
         <SafeAreaView edges={['top']} style={{ backgroundColor: Colors.white }}>
@@ -34,8 +42,15 @@ export default function AppHeader() {
 
                 {/* DIREITA */}
                 <View style={styles.right}>
-                    <TouchableOpacity style={styles.iconButton}>
+                    <TouchableOpacity style={styles.iconButton} onPress={() => setNotifVisible(true)}>
                         <Icons.bell size={20} color={Colors.primary} />
+                        {naoLidas > 0 && (
+                            <View style={styles.badge}>
+                                <Text style={styles.badgeText}>
+                                    {naoLidas > 9 ? '9+' : naoLidas}
+                                </Text>
+                            </View>
+                        )}
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -46,13 +61,16 @@ export default function AppHeader() {
                     </TouchableOpacity>
                 </View>
 
-                {/* DROPDOWN */}
                 <ProfileDropdown
                     visible={dropdownVisible}
                     onClose={() => setDropdownVisible(false)}
                 />
 
-                {/* MENU LATERAL */}
+                <NotificationDropdown
+                    visible={notifVisible}
+                    onClose={() => setNotifVisible(false)}
+                />
+
                 <SideMenu
                     visible={menuVisible}
                     onClose={() => setMenuVisible(false)}
@@ -113,5 +131,24 @@ const styles = StyleSheet.create({
 
     icon: {
         fontSize: 18,
+    },
+
+    badge: {
+        position: 'absolute',
+        top: -2,
+        right: -2,
+        minWidth: 16,
+        height: 16,
+        borderRadius: 8,
+        backgroundColor: Colors.error,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 3,
+    },
+
+    badgeText: {
+        color: Colors.white,
+        fontSize: 10,
+        fontWeight: 'bold',
     },
 })

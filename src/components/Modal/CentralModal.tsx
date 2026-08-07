@@ -93,17 +93,17 @@ export default function CentralModal({
                                 {onConfirm ? (
                                     <>
                                         <TouchableOpacity
-                                            style={[styles.buttonPrimary, { backgroundColor: cancelColor ?? Colors.gray[400] }]}
-                                            onPress={handleCancel}
-                                        >
-                                            <Text style={styles.buttonPrimaryText}>{cancelText}</Text>
-                                        </TouchableOpacity>
-
-                                        <TouchableOpacity
                                             style={[styles.buttonPrimary, { backgroundColor: confirmColor ?? getColor() }]}
                                             onPress={onConfirm}
                                         >
                                             <Text style={styles.buttonPrimaryText}>{confirmText}</Text>
+                                        </TouchableOpacity>
+
+                                        <TouchableOpacity
+                                            style={[styles.buttonPrimary, { backgroundColor: cancelColor ?? Colors.gray[400] }]}
+                                            onPress={handleCancel}
+                                        >
+                                            <Text style={styles.buttonPrimaryText}>{cancelText}</Text>
                                         </TouchableOpacity>
                                     </>
                                 ) : (
