@@ -11,18 +11,14 @@ import {
     ScrollView,
 } from 'react-native'
 import { router } from 'expo-router'
-import { login } from '../../src/services/authService'
-import { useAuthStore } from '../../src/store/authStore'
-import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
+import { solicitarCodigoRecuperacao } from '../../src/services/authService'
+import { Colors, FontSize, Spacing } from '../../src/constants'
 import { globalStyles } from '../../src/constants/globalStyles'
 import BackHeader from '../../src/components/Header/BackHeader'
 import CentralModal from '../../src/components/Modal/CentralModal'
-import PasswordInput from '../../src/components/Input/PasswordInput'
 
-export default function Login() {
-    const { setUser } = useAuthStore()
+export default function RecuperarSenha() {
     const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
     const [modal, setModal] = useState({
         visible: false,
@@ -31,29 +27,32 @@ export default function Login() {
         type: 'default' as 'default' | 'success' | 'error',
     })
 
-    async function handleLogin() {
-        if (!email || !password) {
+    async function handleSolicitar() {
+        const emailLimpo = email.trim().toLowerCase()
+
+        if (!emailLimpo) {
             setModal({
                 visible: true,
                 title: 'Atenção',
-                message: 'Preencha email e senha.',
-                type: 'error',
+                message: 'Informe seu email.',
+                type: 'default',
             })
             return
         }
 
         setLoading(true)
         try {
-            const response = await login(email.trim().toLowerCase(), password)
-            setUser(response.user, response.token)
-            router.replace('/consultor/home')
+            await solicitarCodigoRecuperacao(emailLimpo)
+            // Segue para a tela de código independentemente de o email existir
+            router.push({
+                pathname: '/auth/codigo-recuperacao',
+                params: { email: emailLimpo },
+            } as any)
         } catch (error: any) {
-            let message = error.response?.data?.message || 'Erro ao fazer login.'
-
+            let message = error.response?.data?.message || 'Erro ao solicitar código.'
             if (error.response?.status === 429) {
-                message = 'Muitas tentativas de login. Aguarde um instante para tentar novamente.'
+                message = 'Muitas solicitações. Aguarde alguns minutos e tente novamente.'
             }
-
             setModal({
                 visible: true,
                 title: 'Erro',
@@ -76,15 +75,13 @@ export default function Login() {
                 showsVerticalScrollIndicator={false}
             >
                 <BackHeader
-                    title="Criar conta"
+                    title="Recuperar senha"
                     effectPhrase={''}
-                    subtitle="Preencha seus dados para começar"
-                    showLogo={true}
+                    subtitle="Informe seu email para receber o código"
+                    showLogo={false}
                 />
 
-                {/* Formulário */}
                 <View style={styles.form}>
-
                     <View style={globalStyles.inputGroup}>
                         <Text style={globalStyles.inputLabel}>Email</Text>
                         <TextInput
@@ -97,46 +94,30 @@ export default function Login() {
                             autoCapitalize="none"
                             autoCorrect={false}
                         />
-                    </View>
-
-                    <PasswordInput
-                        label="Senha"
-                        value={password}
-                        onChangeText={setPassword}
-                        placeholder="Sua senha"
-                    />
-
-                    <TouchableOpacity
-                        onPress={() => router.push('/auth/recuperar-senha' as any)}
-                        style={{ alignSelf: 'flex-end' }}
-                    >
-                        <Text style={{ color: Colors.primary, fontSize: FontSize.sm, fontWeight: '600' }}>
-                            Esqueci minha senha
+                        <Text style={globalStyles.inputHint}>
+                            Enviaremos um código de 6 dígitos para o seu email.
                         </Text>
-                    </TouchableOpacity>
+                    </View>
 
                     <TouchableOpacity
                         style={[globalStyles.buttonPrimary, loading && globalStyles.buttonDisabled]}
-                        onPress={handleLogin}
+                        onPress={handleSolicitar}
                         disabled={loading}
                     >
                         {loading ? (
                             <ActivityIndicator color={Colors.white} />
                         ) : (
-                            <Text style={globalStyles.buttonPrimaryText}>Entrar</Text>
+                            <Text style={globalStyles.buttonPrimaryText}>Enviar código</Text>
                         )}
                     </TouchableOpacity>
-
                 </View>
 
-                {/* Link para cadastro */}
                 <View style={styles.footer}>
-                    <Text style={styles.footerText}>Ainda não tem conta? </Text>
-                    <TouchableOpacity onPress={() => router.replace('/auth/register')}>
-                        <Text style={styles.footerLink}>Criar conta</Text>
+                    <Text style={styles.footerText}>Lembrou a senha? </Text>
+                    <TouchableOpacity onPress={() => router.replace('/auth/login')}>
+                        <Text style={styles.footerLink}>Entrar</Text>
                     </TouchableOpacity>
                 </View>
-
             </ScrollView>
 
             <CentralModal
@@ -147,20 +128,13 @@ export default function Login() {
                 dismissable
                 showCloseIcon
                 confirmText="Fechar"
-                onClose={() => setModal({ ...modal, visible: false })}
+                onClose={() => setModal(prev => ({ ...prev, visible: false }))}
             />
         </KeyboardAvoidingView>
     )
 }
 
 const styles = StyleSheet.create({
-    header: {
-        alignItems: 'center',
-        marginBottom: Spacing.xl,
-    },
-    title: {
-        marginTop: Spacing.md,
-    },
     form: {
         gap: Spacing.md,
     },

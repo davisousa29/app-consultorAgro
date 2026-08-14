@@ -42,6 +42,22 @@ export async function me(): Promise<User> {
     return response.data.user
 }
 
+// ── Recuperação de senha ──────────────────────────────────────────────────────
+export async function solicitarCodigoRecuperacao(email: string): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>('/auth/recuperar-senha', { email })
+    return response.data
+}
+
+export async function redefinirSenha(data: {
+    email: string
+    codigo: string
+    password: string
+    password_confirmation: string
+}): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>('/auth/redefinir-senha', data)
+    return response.data
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 async function salvarSessao(data: AuthResponse): Promise<void> {
     await AsyncStorage.setItem('@agro:token', data.token)
