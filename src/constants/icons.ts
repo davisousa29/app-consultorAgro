@@ -27,6 +27,8 @@ import {
     FileText,
     BrushCleaning,
     Trash2,
+    Eye,
+    EyeOff,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -58,4 +60,6 @@ export const Icons = {
     fileText: FileText,
     brushCleaning: BrushCleaning,
     trash: Trash2,
+    eye: Eye,
+    eyeOff: EyeOff,
 }

@@ -17,6 +17,7 @@ import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
 import { globalStyles } from '../../src/constants/globalStyles'
 import BackHeader from '../../src/components/Header/BackHeader'
 import CentralModal from '../../src/components/Modal/CentralModal'
+import PasswordInput from '../../src/components/Input/PasswordInput'
 
 export default function Login() {
     const { setUser } = useAuthStore()
@@ -94,17 +95,12 @@ export default function Login() {
                         />
                     </View>
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Senha</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Sua senha"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
-                    </View>
+                    <PasswordInput
+                        label="Senha"
+                        value={password}
+                        onChangeText={setPassword}
+                        placeholder="Sua senha"
+                    />
 
                     <TouchableOpacity
                         style={[globalStyles.buttonPrimary, loading && globalStyles.buttonDisabled]}
