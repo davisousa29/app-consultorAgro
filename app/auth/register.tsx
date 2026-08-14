@@ -65,9 +65,9 @@ export default function Register() {
         setLoading(true)
         try {
             const response = await register({
-                name,
-                email,
-                username,
+                name: name.trim(),
+                email: email.trim().toLowerCase(),
+                username: username.trim().toLowerCase(),
                 phone,
                 whatsapp,
                 password,

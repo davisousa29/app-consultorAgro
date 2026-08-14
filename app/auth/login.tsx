@@ -44,7 +44,7 @@ export default function Login() {
 
         setLoading(true)
         try {
-            const response = await login(email, password)
+            const response = await login(email.trim().toLowerCase(), password)
             setUser(response.user, response.token)
             router.replace('/consultor/home')
         } catch (error: any) {
