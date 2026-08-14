@@ -48,7 +48,11 @@ export default function Login() {
             setUser(response.user, response.token)
             router.replace('/consultor/home')
         } catch (error: any) {
-            const message = error.response?.data?.message || 'Erro ao fazer login.'
+            let message = error.response?.data?.message || 'Erro ao fazer login.'
+
+            if (error.response?.status === 429) {
+                message = 'Muitas tentativas de login. Aguarde um instante para tentar novamente.'
+            }
 
             setModal({
                 visible: true,
