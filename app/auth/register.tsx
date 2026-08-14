@@ -20,6 +20,7 @@ import MaskedInput from '../../src/components/Input/MaskedInput'
 import { phoneMask } from '../../src/utils/masks'
 import CentralModal from '../../src/components/Modal/CentralModal'
 import PasswordInput from '../../src/components/Input/PasswordInput'
+import PasswordStrength from '../../src/components/Input/PasswordStrength'
 
 export default function Register() {
     const { setUser } = useAuthStore()
@@ -126,19 +127,31 @@ export default function Register() {
                 {/* Formulário */}
                 <View style={styles.form}>
 
-                    <PasswordInput
-                        label="Senha *"
-                        value={password}
-                        onChangeText={setPassword}
-                        placeholder="Mínimo 8 caracteres"
-                    />
+                    <View style={globalStyles.inputGroup}>
+                        <Text style={globalStyles.inputLabel}>Nome completo *</Text>
+                        <TextInput
+                            style={globalStyles.input}
+                            placeholder="Seu nome completo"
+                            placeholderTextColor={Colors.gray[400]}
+                            value={name}
+                            onChangeText={setName}
+                            autoCapitalize="words"
+                        />
+                    </View>
 
-                    <PasswordInput
-                        label="Confirmar senha *"
-                        value={passwordConfirmation}
-                        onChangeText={setPasswordConfirmation}
-                        placeholder="Repita sua senha"
-                    />
+                    <View style={globalStyles.inputGroup}>
+                        <Text style={globalStyles.inputLabel}>Email *</Text>
+                        <TextInput
+                            style={globalStyles.input}
+                            placeholder="seu@email.com"
+                            placeholderTextColor={Colors.gray[400]}
+                            value={email}
+                            onChangeText={setEmail}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            autoCorrect={false}
+                        />
+                    </View>
 
                     <View style={globalStyles.inputGroup}>
                         <Text style={globalStyles.inputLabel}>Nome de usuário *</Text>
@@ -175,29 +188,22 @@ export default function Register() {
                         mask={phoneMask}
                     />
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Senha *</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Mínimo 8 caracteres"
-                            placeholderTextColor={Colors.gray[400]}
+                    <View>
+                        <PasswordInput
+                            label="Senha *"
                             value={password}
                             onChangeText={setPassword}
-                            secureTextEntry
+                            placeholder="Mínimo 8 caracteres"
                         />
+                        <PasswordStrength senha={password} />
                     </View>
 
-                    <View style={globalStyles.inputGroup}>
-                        <Text style={globalStyles.inputLabel}>Confirmar senha *</Text>
-                        <TextInput
-                            style={globalStyles.input}
-                            placeholder="Repita sua senha"
-                            placeholderTextColor={Colors.gray[400]}
-                            value={passwordConfirmation}
-                            onChangeText={setPasswordConfirmation}
-                            secureTextEntry
-                        />
-                    </View>
+                    <PasswordInput
+                        label="Confirmar senha *"
+                        value={passwordConfirmation}
+                        onChangeText={setPasswordConfirmation}
+                        placeholder="Repita sua senha"
+                    />
 
                     <TouchableOpacity
                         style={[
