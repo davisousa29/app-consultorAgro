@@ -21,6 +21,11 @@ import { phoneMask } from '../../src/utils/masks'
 import CentralModal from '../../src/components/Modal/CentralModal'
 import PasswordInput from '../../src/components/Input/PasswordInput'
 import PasswordStrength from '../../src/components/Input/PasswordStrength'
+import { loginComGoogle } from '../../src/services/authService'
+import GoogleButton from '../../src/components/GoogleButton'
+import { useGoogleAuth } from '../../src/hooks/useGoogleAuth'
+
+const GOOGLE_LOGIN_HABILITADO = false
 
 export default function Register() {
     const { setUser } = useAuthStore()
@@ -39,6 +44,30 @@ export default function Register() {
         title: '',
         message: '',
         type: 'default' as 'default' | 'success' | 'error',
+    })
+    const [loadingGoogle, setLoadingGoogle] = useState(false)
+
+    const { pronto, login: iniciarGoogle } = useGoogleAuth(async (accessToken) => {
+        setLoadingGoogle(true)
+        try {
+            const resposta = await loginComGoogle(accessToken)
+            setUser(resposta.user, resposta.token)
+
+            if (resposta.cadastro_completo) {
+                router.replace('/consultor/home')
+            } else {
+                router.replace('/auth/completar-cadastro')
+            }
+        } catch (error: any) {
+            setModal({
+                visible: true,
+                title: 'Erro',
+                message: error.response?.data?.message || 'Erro ao entrar com Google.',
+                type: 'error',
+            })
+        } finally {
+            setLoadingGoogle(false)
+        }
     })
 
     async function handleRegister() {
@@ -220,6 +249,24 @@ export default function Register() {
                         )}
                     </TouchableOpacity>
 
+                    {GOOGLE_LOGIN_HABILITADO && (
+                        <>
+                            {/* Separador */}
+                            <View style={styles.separador}>
+                                <View style={styles.linha} />
+                                <Text style={styles.separadorTexto}>ou</Text>
+                                <View style={styles.linha} />
+                            </View>
+
+                            <GoogleButton
+                                onPress={iniciarGoogle}
+                                loading={loadingGoogle}
+                                texto="Cadastrar com Google"
+                                disabled={!pronto}
+                            />
+                        </>
+                    )}
+
                 </View>
 
                 {/* Link para login */}
@@ -288,5 +335,20 @@ const styles = StyleSheet.create({
         color: Colors.primary,
         fontSize: FontSize.sm,
         fontWeight: 'bold',
+    },
+    separador: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.sm,
+        marginVertical: Spacing.xs,
+    },
+    linha: {
+        flex: 1,
+        height: 1,
+        backgroundColor: Colors.gray[300],
+    },
+    separadorTexto: {
+        fontSize: FontSize.sm,
+        color: Colors.gray[500],
     },
 })

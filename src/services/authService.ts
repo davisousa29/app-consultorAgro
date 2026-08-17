@@ -77,3 +77,12 @@ export async function getUsuarioLocal(): Promise<User | null> {
 export async function getTokenLocal(): Promise<string | null> {
     return AsyncStorage.getItem('@agro:token')
 }
+
+// ── Login com Google ──────────────────────────────────────────────────────────
+export async function loginComGoogle(accessToken: string): Promise<AuthResponse & { cadastro_completo: boolean }> {
+    const response = await api.post<AuthResponse & { cadastro_completo: boolean }>('/auth/google', {
+        access_token: accessToken,
+    })
+    await salvarSessao(response.data)
+    return response.data
+}

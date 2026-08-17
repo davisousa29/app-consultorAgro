@@ -11,24 +11,52 @@ import {
     ScrollView,
 } from 'react-native'
 import { router } from 'expo-router'
-import { login } from '../../src/services/authService'
+import { login, loginComGoogle } from '../../src/services/authService'
 import { useAuthStore } from '../../src/store/authStore'
 import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
 import { globalStyles } from '../../src/constants/globalStyles'
 import BackHeader from '../../src/components/Header/BackHeader'
 import CentralModal from '../../src/components/Modal/CentralModal'
 import PasswordInput from '../../src/components/Input/PasswordInput'
+import GoogleButton from '../../src/components/GoogleButton'
+import { useGoogleAuth } from '../../src/hooks/useGoogleAuth'
+
+const GOOGLE_LOGIN_HABILITADO = false
 
 export default function Login() {
     const { setUser } = useAuthStore()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
+    const [loadingGoogle, setLoadingGoogle] = useState(false)
     const [modal, setModal] = useState({
         visible: false,
         title: '',
         message: '',
         type: 'default' as 'default' | 'success' | 'error',
+    })
+
+    const { pronto, login: iniciarGoogle } = useGoogleAuth(async (accessToken) => {
+        setLoadingGoogle(true)
+        try {
+            const resposta = await loginComGoogle(accessToken)
+            setUser(resposta.user, resposta.token)
+
+            if (resposta.cadastro_completo) {
+                router.replace('/consultor/home')
+            } else {
+                router.replace('/auth/completar-cadastro')
+            }
+        } catch (error: any) {
+            setModal({
+                visible: true,
+                title: 'Erro',
+                message: error.response?.data?.message || 'Erro ao entrar com Google.',
+                type: 'error',
+            })
+        } finally {
+            setLoadingGoogle(false)
+        }
     })
 
     async function handleLogin() {
@@ -127,6 +155,24 @@ export default function Login() {
                         )}
                     </TouchableOpacity>
 
+                    {/* Separador */}
+                    {GOOGLE_LOGIN_HABILITADO && (
+                        <>
+                            {/* Separador */}
+                            <View style={styles.separador}>
+                                <View style={styles.linha} />
+                                <Text style={styles.separadorTexto}>ou</Text>
+                                <View style={styles.linha} />
+                            </View>
+
+                            <GoogleButton
+                                onPress={iniciarGoogle}
+                                loading={loadingGoogle}
+                                disabled={!pronto}
+                            />
+                        </>
+                    )}
+
                 </View>
 
                 {/* Link para cadastro */}
@@ -163,6 +209,21 @@ const styles = StyleSheet.create({
     },
     form: {
         gap: Spacing.md,
+    },
+    separador: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.sm,
+        marginVertical: Spacing.xs,
+    },
+    linha: {
+        flex: 1,
+        height: 1,
+        backgroundColor: Colors.gray[300],
+    },
+    separadorTexto: {
+        fontSize: FontSize.sm,
+        color: Colors.gray[500],
     },
     footer: {
         flexDirection: 'row',
