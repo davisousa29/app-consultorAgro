@@ -112,6 +112,17 @@ export default function Register() {
                 type: 'success',
             })
         } catch (error: any) {
+            if (error.response?.status === 429) {
+                setModal({
+                    visible: true,
+                    title: 'Muitas tentativas',
+                    message: 'Você atingiu o limite de cadastros. Aguarde um pouco antes de tentar novamente.',
+                    type: 'error',
+                })
+                setLoading(false)
+                return
+            }
+
             const errors = error.response?.data?.errors
 
             if (errors) {

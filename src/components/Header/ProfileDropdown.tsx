@@ -64,6 +64,17 @@ export default function ProfileDropdown({ visible, onClose }: Props) {
 
                     <TouchableOpacity
                         style={styles.item}
+                        onPress={() => handleNavigate('/consultor/configuracoes')}
+                        activeOpacity={0.7}
+                    >
+                        <Icons.settings size={20} color={Colors.black} />
+                        <Text style={styles.itemLabel}>Configurações</Text>
+                    </TouchableOpacity>
+
+                    <View style={styles.divider} />
+
+                    <TouchableOpacity
+                        style={styles.item}
                         onPress={handleLogout}
                         activeOpacity={0.7}
                     >

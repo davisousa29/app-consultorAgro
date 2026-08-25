@@ -29,6 +29,7 @@ import {
     Trash2,
     Eye,
     EyeOff,
+    Shield,
 } from 'lucide-react-native'
 
 export const Icons = {
@@ -62,4 +63,5 @@ export const Icons = {
     trash: Trash2,
     eye: Eye,
     eyeOff: EyeOff,
+    shield: Shield,
 }
