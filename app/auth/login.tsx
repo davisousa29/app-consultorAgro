@@ -73,6 +73,18 @@ export default function Login() {
         setLoading(true)
         try {
             const response = await login(email.trim().toLowerCase(), password)
+
+            if (response.requer_2fa) {
+                router.push({
+                    pathname: '/auth/verificar-2fa',
+                    params: {
+                        email: email.trim().toLowerCase(),
+                        metodos: JSON.stringify(response.metodos),
+                    },
+                } as any)
+                return
+            }
+
             setUser(response.user, response.token)
             router.replace('/consultor/home')
         } catch (error: any) {

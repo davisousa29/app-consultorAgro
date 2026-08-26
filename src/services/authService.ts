@@ -21,8 +21,13 @@ export async function register(data: {
 }
 
 // ── Login ─────────────────────────────────────────────────────────────────────
-export async function login(email: string, password: string): Promise<AuthResponse> {
-    const response = await api.post<AuthResponse>('/auth/login', { email, password })
+export async function login(email: string, password: string): Promise<any> {
+    const response = await api.post<any>('/auth/login', { email, password })
+
+    if (response.data.requer_2fa) {
+        return response.data
+    }
+
     await salvarSessao(response.data)
     return response.data
 }
@@ -31,11 +36,12 @@ export async function login(email: string, password: string): Promise<AuthRespon
 export async function logout(): Promise<void> {
     try {
         await api.post('/auth/logout')
+    } catch {
+        // Ignora erro do servidor (ex: token já invalido) — o importante é limpar a sessão local
     } finally {
         await limparSessao()
     }
 }
-
 // ── Usuário autenticado ───────────────────────────────────────────────────────
 export async function me(): Promise<User> {
     const response = await api.get<{ user: User }>('/auth/me')

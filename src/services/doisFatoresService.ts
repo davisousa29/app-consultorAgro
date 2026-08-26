@@ -33,3 +33,19 @@ export async function desativar2fa(password: string): Promise<{ message: string 
     const response = await api.post<{ message: string }>('/2fa/desativar', { password })
     return response.data
 }
+
+// ── Login 2FA: enviar código por email ────────────────────────────────────────
+export async function enviarCodigoEmail2fa(email: string): Promise<{ message: string }> {
+    const response = await api.post<{ message: string }>('/2fa/login/enviar-email', { email })
+    return response.data
+}
+
+// ── Login 2FA: verificar código e finalizar login ─────────────────────────────
+export async function verificarLogin2fa(dados: {
+    email: string
+    codigo: string
+    metodo: 'authenticator' | 'email' | 'backup'
+}): Promise<any> {
+    const response = await api.post('/2fa/login/verificar', dados)
+    return response.data
+}
