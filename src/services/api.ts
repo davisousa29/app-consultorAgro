@@ -28,10 +28,6 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     async (error) => {
-        if (error.response?.status === 401) {
-            await AsyncStorage.removeItem('@agro:token')
-            await AsyncStorage.removeItem('@agro:user')
-        }
         return Promise.reject(error)
     }
 )
