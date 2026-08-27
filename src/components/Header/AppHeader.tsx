@@ -35,7 +35,7 @@ export default function AppHeader() {
                     <TouchableOpacity
                         onPress={() => router.replace('/consultor/home')}
                     >
-                        <Text style={styles.title}>AgroSystem</Text>
+                        <Text style={styles.title}>Colchete</Text>
                     </TouchableOpacity>
 
                 </View>

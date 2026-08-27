@@ -46,7 +46,7 @@ export default function AuthBottomSheet() {
                     style={[styles.sheet, { transform: [{ translateY }] }]}
                 >
                     <View style={styles.indicator} />
-                    <Text style={globalStyles.modalTitle}>Bem-vindo ao AgroSystem</Text>
+                    <Text style={globalStyles.modalTitle}>Bem-vindo ao Colchete</Text>
                     <Text style={globalStyles.modalSubtitle}>
                         Entre ou crie sua conta para continuar
                     </Text>

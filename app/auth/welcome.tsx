@@ -12,7 +12,7 @@ export default function Welcome() {
 
                 <View style={styles.header}>
                     <Logo size={100} />
-                    <Text style={styles.title}>AgroSystem</Text>
+                    <Text style={styles.title}>Colchete</Text>
                     <Text style={styles.subtitle}>Consultor Agropecuário</Text>
                 </View>
 
