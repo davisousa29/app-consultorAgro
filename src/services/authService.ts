@@ -6,6 +6,7 @@ import { AuthResponse, User } from '../types'
 export async function register(data: {
     name: string
     email: string
+    cpf: string
     phone: string
     username: string
     whatsapp: string

@@ -24,6 +24,8 @@ import PasswordStrength from '../../src/components/Input/PasswordStrength'
 import { loginComGoogle } from '../../src/services/authService'
 import GoogleButton from '../../src/components/GoogleButton'
 import { useGoogleAuth } from '../../src/hooks/useGoogleAuth'
+import { cpfMask } from '../../src/utils/masks/cpfMask'
+import { isValidCpf } from '../../src/utils/document'
 
 const GOOGLE_LOGIN_HABILITADO = false
 
@@ -39,6 +41,7 @@ export default function Register() {
     const [passwordConfirmation, setPasswordConfirmation] = useState('')
     const [loading, setLoading] = useState(false)
     const [isSuccess, setIsSuccess] = useState(false)
+    const [cpf, setCpf] = useState('')
     const [modal, setModal] = useState({
         visible: false,
         title: '',
@@ -71,7 +74,7 @@ export default function Register() {
     })
 
     async function handleRegister() {
-        if (!name || !email || !username || !password || !passwordConfirmation) {
+        if (!name || !email || !cpf || !username || !password || !passwordConfirmation) {
             setModal({
                 visible: true,
                 title: 'Atenção',
@@ -91,11 +94,22 @@ export default function Register() {
             return
         }
 
+        if (!isValidCpf(cpf)) {
+            setModal({
+                visible: true,
+                title: 'Atenção',
+                message: 'Informe um CPF válido.',
+                type: 'default',
+            })
+            return
+        }
+
         setLoading(true)
         try {
             const response = await register({
                 name: name.trim(),
                 email: email.trim().toLowerCase(),
+                cpf,
                 username: username.trim().toLowerCase(),
                 phone,
                 whatsapp,
@@ -192,6 +206,15 @@ export default function Register() {
                             autoCorrect={false}
                         />
                     </View>
+
+                    <MaskedInput
+                        label="CPF *"
+                        value={cpf}
+                        onChange={setCpf}
+                        placeholder="000.000.000-00"
+                        keyboardType="number-pad"
+                        mask={cpfMask}
+                    />
 
                     <View style={globalStyles.inputGroup}>
                         <Text style={globalStyles.inputLabel}>Nome de usuário *</Text>
