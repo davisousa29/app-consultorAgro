@@ -1,24 +1,36 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
 import { router, useFocusEffect } from 'expo-router'
 import { useNotificacaoStore } from '../../src/store/notificacaoStore'
 import { useAuthStore } from '../../src/store/authStore'
 import api from '../../src/services/api'
 import { Colors, FontSize, Spacing } from '../../src/constants'
 import { menuItems } from '../../src/constants/menuItems'
+import { getSubscriptionStatus, SubscriptionStatus } from '../../src/services/subscriptionService'
+import TrialBanner from '../../src/components/TrialBanner'
 import QuickShortcuts from '../../src/components/QuickShortcuts/QuickShortcuts'
 
 export default function Home() {
 
     const { user, profile, setProfile } = useAuthStore()
     const { atualizarNaoLidas } = useNotificacaoStore()
+    const [subscription, setSubscription] = useState<SubscriptionStatus | null>(null)
 
-    // Atualiza o badge sempre que a home ganha foco
     useFocusEffect(
         useCallback(() => {
             atualizarNaoLidas()
+            carregarStatusAssinatura()
         }, [])
     )
+
+    async function carregarStatusAssinatura() {
+        try {
+            const status = await getSubscriptionStatus()
+            setSubscription(status)
+        } catch (error) {
+            console.log('Erro ao carregar status da assinatura', error)
+        }
+    }
 
     useEffect(() => {
         async function loadProfile() {
@@ -37,6 +49,8 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
+            <TrialBanner subscription={subscription} />
+
             <View style={styles.cardUserDescrible}>
 
                 <Image
