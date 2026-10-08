@@ -8,33 +8,43 @@ interface Props {
     subscription: SubscriptionStatus | null
 }
 
+// Assinante pago passa a ver o aviso quando faltam até X dias
+const DIAS_AVISO_RENOVACAO = 7
+
+function textoDias(dias: number) {
+    return `${dias} dia${dias !== 1 ? 's' : ''}`
+}
+
 export default function TrialBanner({ subscription }: Props) {
-    // Não mostra nada se: sem dados, vitalício, ou já é assinante ativo pagante
     if (!subscription) return null
     if (subscription.is_lifetime) return null
-    if (subscription.status === 'active') return null
-
-    // Só mostra durante o trial
-    if (subscription.status !== 'trial') return null
 
     const dias = subscription.days_remaining
+    let titulo: string
+    let subtitulo: string
+
+    if (subscription.status === 'trial') {
+        titulo = dias > 0 ? `Seu teste grátis termina em ${textoDias(dias)}` : 'Seu teste grátis termina hoje'
+        subtitulo = 'Assine um plano para continuar usando'
+    } else if (subscription.status === 'active' && dias <= DIAS_AVISO_RENOVACAO) {
+        titulo = dias > 0 ? `Sua assinatura vence em ${textoDias(dias)}` : 'Sua assinatura vence hoje'
+        subtitulo = 'Renove agora: os dias que faltam não são perdidos'
+    } else {
+        return null
+    }
 
     return (
         <TouchableOpacity
             style={styles.container}
-            onPress={() => router.push('/consultor/planos' as any)}
+            onPress={() => router.push('/assinatura/planos' as any)}
             activeOpacity={0.85}
         >
             <View style={styles.icone}>
                 <Clock size={20} color="#B7791F" />
             </View>
             <View style={styles.conteudo}>
-                <Text style={styles.titulo}>
-                    {dias > 0
-                        ? `Seu teste grátis termina em ${dias} dia${dias !== 1 ? 's' : ''}`
-                        : 'Seu teste grátis termina hoje'}
-                </Text>
-                <Text style={styles.subtitulo}>Assine um plano para continuar usando</Text>
+                <Text style={styles.titulo}>{titulo}</Text>
+                <Text style={styles.subtitulo}>{subtitulo}</Text>
             </View>
             <ChevronRight size={18} color="#B7791F" />
         </TouchableOpacity>

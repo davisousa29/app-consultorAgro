@@ -78,7 +78,7 @@ export default function AssinaturaExpirada() {
 
             <TouchableOpacity
                 style={[globalStyles.buttonPrimary, styles.botaoPlanos]}
-                onPress={() => router.push('/consultor/planos' as any)}
+                onPress={() => router.push('/assinatura/planos' as any)}
                 activeOpacity={0.8}
             >
                 <Text style={globalStyles.buttonPrimaryText}>Ver planos</Text>

@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const api = axios.create({
     // baseURL: 'http://localhost/api',
-    baseURL: 'http://192.168.1.51/api',
+    baseURL: 'http://192.168.1.34/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ api.interceptors.response.use(
         // Assinatura expirada — redireciona para a tela de bloqueio
         if (error.response?.status === 402 && error.response?.data?.subscription === 'inactive') {
             const { router } = require('expo-router')
-            router.replace('/consultor/assinatura-expirada')
+            router.replace('/assinatura/expirada')
         }
         return Promise.reject(error)
     }
