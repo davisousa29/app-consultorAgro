@@ -12,9 +12,9 @@ import { ChevronRight, FlaskConical } from 'lucide-react-native'
 import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
 import { globalStyles } from '@/src/constants/globalStyles'
 import { Icons } from '@/src/constants/icons'
-import SearchBar from '@/src/components/SearchBar'
-import FilterChips, { FilterChip } from '@/src/components/FilterChips'
-import FilterModal, { FilterGroup } from '@/src/components/FilterModal'
+import SearchBar from '@/src/components/Input/SearchBar'
+import FilterChips, { FilterChip } from '@/src/components/Filter/FilterChips'
+import FilterModal, { FilterGroup } from '@/src/components/Filter/FilterModal'
 import api from '@/src/services/api'
 import BackButton from "@/src/components/Header/BackButton";
 

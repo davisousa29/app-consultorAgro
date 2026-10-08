@@ -15,7 +15,7 @@ function textoDias(dias: number) {
     return `${dias} dia${dias !== 1 ? 's' : ''}`
 }
 
-export default function TrialBanner({ subscription }: Props) {
+export default function SubscriptionBanner({ subscription }: Props) {
     if (!subscription) return null
     if (subscription.is_lifetime) return null
 

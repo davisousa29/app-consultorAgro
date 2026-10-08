@@ -12,10 +12,10 @@ import { TrendingUp, ChevronRight } from 'lucide-react-native'
 import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
 import { globalStyles } from '@/src/constants/globalStyles'
 import { Icons } from '@/src/constants/icons'
-import SearchBar from '@/src/components/SearchBar'
-import FilterModal, { FilterGroup } from '@/src/components/FilterModal'
+import SearchBar from '@/src/components/Input/SearchBar'
+import FilterModal, { FilterGroup } from '@/src/components/Filter/FilterModal'
 import BackButton from '@/src/components/Header/BackButton'
-import { FilterChip } from '@/src/components/FilterChips'
+import { FilterChip } from '@/src/components/Filter/FilterChips'
 import api from '@/src/services/api'
 
 interface Projecao {

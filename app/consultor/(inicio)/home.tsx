@@ -7,7 +7,7 @@ import api from '@/src/services/api'
 import { Colors, FontSize, Spacing } from '@/src/constants'
 import { menuItems } from '@/src/constants/menuItems'
 import { getSubscriptionStatus, SubscriptionStatus } from '@/src/services/subscriptionService'
-import TrialBanner from '@/src/components/TrialBanner'
+import SubscriptionBanner from '@/src/components/Subscription/SubscriptionBanner'
 import QuickShortcuts from '@/src/components/QuickShortcuts/QuickShortcuts'
 
 export default function Home() {
@@ -49,7 +49,7 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
-            <TrialBanner subscription={subscription} />
+            <SubscriptionBanner subscription={subscription} />
 
             <View style={styles.cardUserDescrible}>
 

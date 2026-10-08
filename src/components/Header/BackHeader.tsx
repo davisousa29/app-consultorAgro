@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 
 import { Colors, FontSize, Spacing } from '@/src/constants'
 import { globalStyles } from "@/src/constants/globalStyles";
-import Logo from "@/src/components/Logo";
+import Logo from "@/src/components/Brand/Logo";
 
 interface Props {
     title?: ReactNode
