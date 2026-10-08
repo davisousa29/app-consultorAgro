@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
-import { Colors, Spacing, BorderRadius, FontSize } from '../constants'
+import { Colors, Spacing, BorderRadius, FontSize } from '@/src/constants'
 
 export interface FilterChip {
     label: string

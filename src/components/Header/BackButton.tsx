@@ -1,6 +1,6 @@
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { router } from 'expo-router'
-import { Colors, FontSize, Spacing } from '../../constants'
+import { Colors, FontSize, Spacing } from '@/src/constants'
 
 interface Props {
     onPress?: () => void

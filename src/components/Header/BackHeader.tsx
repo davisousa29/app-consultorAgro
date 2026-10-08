@@ -2,9 +2,9 @@ import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { ReactNode } from "react";
 
-import { Colors, FontSize, Spacing } from '../../constants'
-import { globalStyles } from "../../constants/globalStyles";
-import Logo from "../Logo";
+import { Colors, FontSize, Spacing } from '@/src/constants'
+import { globalStyles } from "@/src/constants/globalStyles";
+import Logo from "@/src/components/Logo";
 
 interface Props {
     title?: ReactNode

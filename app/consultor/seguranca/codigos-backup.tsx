@@ -9,9 +9,9 @@ import {
 import { router, useLocalSearchParams } from 'expo-router'
 import * as Clipboard from 'expo-clipboard'
 import { Copy, Check, ShieldAlert } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import { toastInfo } from '../../../src/utils/toast'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { toastInfo } from '@/src/utils/toast'
 
 export default function CodigosBackup() {
     const { codigos } = useLocalSearchParams<{ codigos: string }>()

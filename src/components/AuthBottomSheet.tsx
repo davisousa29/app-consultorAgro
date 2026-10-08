@@ -8,9 +8,9 @@ import {
     Animated,
 } from 'react-native'
 import { router, usePathname } from 'expo-router'
-import { Colors, FontSize, Spacing, BorderRadius } from '../constants'
-import { useAuthStore } from '../store/authStore';
-import { globalStyles } from '../../src/constants/globalStyles'
+import { Colors, FontSize, Spacing, BorderRadius } from '@/src/constants'
+import { useAuthStore } from '@/src/store/authStore';
+import { globalStyles } from '@/src/constants/globalStyles'
 
 export default function AuthBottomSheet() {
     const { isLoggedIn, isLoading } = useAuthStore()

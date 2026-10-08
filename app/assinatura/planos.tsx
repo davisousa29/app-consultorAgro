@@ -11,8 +11,8 @@ import {
 import { router, useFocusEffect } from 'expo-router'
 import * as Clipboard from 'expo-clipboard'
 import { ArrowLeft, Check, Copy } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
 import {
     getPlans,
     createCheckout,
@@ -21,7 +21,7 @@ import {
     Plan,
     PixData,
     CheckoutPayment,
-} from '../../src/services/subscriptionService'
+} from '@/src/services/subscriptionService'
 
 const INTERVALO_CONSULTA_MS = 4000
 

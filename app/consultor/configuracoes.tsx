@@ -1,10 +1,10 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import { router } from 'expo-router'
 import { ChevronRight } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import { Icons } from '../../src/constants/icons'
-import BackButton from '../../src/components/Header/BackButton'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { Icons } from '@/src/constants/icons'
+import BackButton from '@/src/components/Header/BackButton'
 
 interface ItemConfig {
     icone: any

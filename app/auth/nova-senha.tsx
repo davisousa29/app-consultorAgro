@@ -10,13 +10,13 @@ import {
     ScrollView,
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
-import { redefinirSenha } from '../../src/services/authService'
-import { Colors, FontSize, Spacing } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import BackHeader from '../../src/components/Header/BackHeader'
-import CentralModal from '../../src/components/Modal/CentralModal'
-import PasswordInput from '../../src/components/Input/PasswordInput'
-import PasswordStrength from '../../src/components/Input/PasswordStrength'
+import { redefinirSenha } from '@/src/services/authService'
+import { Colors, FontSize, Spacing } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackHeader from '@/src/components/Header/BackHeader'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import PasswordInput from '@/src/components/Input/PasswordInput'
+import PasswordStrength from '@/src/components/Input/PasswordStrength'
 
 export default function NovaSenha() {
     const { email, codigo } = useLocalSearchParams<{ email: string; codigo: string }>()

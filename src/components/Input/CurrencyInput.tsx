@@ -1,7 +1,7 @@
 import { View, Text, TextInput, StyleSheet } from 'react-native'
-import { globalStyles } from '../../constants/globalStyles'
-import { Colors, BorderRadius, FontSize, Spacing } from '../../constants'
-import { currencyMask, parseCurrency } from '../../utils/masks/currencyMask'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { Colors, BorderRadius, FontSize, Spacing } from '@/src/constants'
+import { currencyMask, parseCurrency } from '@/src/utils/masks/currencyMask'
 
 interface CurrencyInputProps {
     label: string

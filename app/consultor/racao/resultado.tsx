@@ -8,14 +8,14 @@ import {
     ActivityIndicator,
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import BackButton from '../../../src/components/Header/BackButton'
-import CentralModal from '../../../src/components/Modal/CentralModal'
-import api from '../../../src/services/api'
-import { formatarNumero } from '../../../src/utils/numbers'
-import { currencyMask } from '../../../src/utils/masks/currencyMask'
-import { Icons } from '../../../src/constants/icons'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackButton from '@/src/components/Header/BackButton'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import api from '@/src/services/api'
+import { formatarNumero } from '@/src/utils/numbers'
+import { currencyMask } from '@/src/utils/masks/currencyMask'
+import { Icons } from '@/src/constants/icons'
 
 interface IngredienteParam {
     ingrediente_id: string

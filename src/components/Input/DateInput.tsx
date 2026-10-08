@@ -1,6 +1,6 @@
 import { View, Text, TextInput, StyleSheet } from 'react-native'
-import { globalStyles } from '../../constants/globalStyles'
-import { Colors } from '../../constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { Colors } from '@/src/constants'
 
 interface DateInputProps {
     label: string

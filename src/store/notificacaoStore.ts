@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { contarNaoLidas } from '../services/notificacaoService'
+import { contarNaoLidas } from '@/src/services/notificacaoService'
 
 interface NotificacaoState {
     naoLidas: number

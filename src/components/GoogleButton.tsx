@@ -1,6 +1,6 @@
 import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native'
 import Svg, { Path } from 'react-native-svg'
-import { Colors, Spacing, FontSize, BorderRadius } from '../constants'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
 
 interface Props {
     onPress: () => void

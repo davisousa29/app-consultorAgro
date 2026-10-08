@@ -8,14 +8,14 @@ import {
 } from 'react-native'
 import { useState, useEffect } from 'react'
 import { router } from 'expo-router'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
-import { Icons } from '../../constants/icons'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { Icons } from '@/src/constants/icons'
 import {
     ultimasNotificacoes,
     marcarLida,
     Notificacao,
-} from '../../services/notificacaoService'
-import { useNotificacaoStore } from '../../store/notificacaoStore'
+} from '@/src/services/notificacaoService'
+import { useNotificacaoStore } from '@/src/store/notificacaoStore'
 
 interface Props {
     visible: boolean

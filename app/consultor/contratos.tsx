@@ -9,14 +9,14 @@ import {
 } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import { FileText, ChevronRight, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react-native'
-import { listarContratos } from '../../src/services/contratoService'
-import { Contrato } from '../../src/types'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import SearchBar from '../../src/components/SearchBar'
-import FilterChips, { FilterChip } from '../../src/components/FilterChips'
-import { Icons } from '../../src/constants/icons'
-import BackButton from '../../src/components/Header/BackButton'
+import { listarContratos } from '@/src/services/contratoService'
+import { Contrato } from '@/src/types'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import SearchBar from '@/src/components/SearchBar'
+import FilterChips, { FilterChip } from '@/src/components/FilterChips'
+import { Icons } from '@/src/constants/icons'
+import BackButton from '@/src/components/Header/BackButton'
 
 const STATUS_CHIPS: FilterChip[] = [
     { label: 'Todos',     value: 'todos' },

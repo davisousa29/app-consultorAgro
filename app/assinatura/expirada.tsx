@@ -8,11 +8,11 @@ import {
 } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import { LockKeyhole } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import { getSubscriptionStatus } from '../../src/services/subscriptionService'
-import { logout } from '../../src/services/authService'
-import { useAuthStore } from '../../src/store/authStore'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { getSubscriptionStatus } from '@/src/services/subscriptionService'
+import { logout } from '@/src/services/authService'
+import { useAuthStore } from '@/src/store/authStore'
 
 export default function AssinaturaExpirada() {
     const { clearUser } = useAuthStore()

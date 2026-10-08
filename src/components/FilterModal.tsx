@@ -9,9 +9,9 @@ import {
     SafeAreaView,
 } from 'react-native'
 import { SlidersHorizontal, X } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../constants'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
 import FilterChips, { FilterChip } from './FilterChips'
-import { Icons } from '../constants/icons'
+import { Icons } from '@/src/constants/icons'
 
 export interface FilterGroup {
     label: string
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     overlayFundo: {
-        ...StyleSheet.absoluteFillObject,
+        ...StyleSheet.absoluteFill,
         backgroundColor: 'rgba(0,0,0,0.4)',
     },
     sheet: {

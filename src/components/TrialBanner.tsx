@@ -1,8 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { router } from 'expo-router'
 import { Clock, ChevronRight } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../constants'
-import { SubscriptionStatus } from '../services/subscriptionService'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { SubscriptionStatus } from '@/src/services/subscriptionService'
 
 interface Props {
     subscription: SubscriptionStatus | null

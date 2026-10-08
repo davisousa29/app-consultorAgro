@@ -11,13 +11,13 @@ import {
     Platform,
 } from 'react-native'
 import { router } from 'expo-router'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import BackButton from '../../../src/components/Header/BackButton'
-import FilterChips, { FilterChip } from '../../../src/components/FilterChips'
-import CentralModal from '../../../src/components/Modal/CentralModal'
-import api from '../../../src/services/api'
-import { sanitizarNumero, parsearNumero, isNumeroValido } from '../../../src/utils/numbers'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackButton from '@/src/components/Header/BackButton'
+import FilterChips, { FilterChip } from '@/src/components/FilterChips'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import api from '@/src/services/api'
+import { sanitizarNumero, parsearNumero, isNumeroValido } from '@/src/utils/numbers'
 
 interface Especie { id: string; nome: string }
 interface Raca { id: string; nome: string; grupo: string }

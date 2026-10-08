@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { User } from '../types'
-import { Profile } from '../types'
+import { User } from '@/src/types'
+import { Profile } from '@/src/types'
 
 // ── Formato do store ──────────────────────────────────────────────────────────
 interface AuthState {

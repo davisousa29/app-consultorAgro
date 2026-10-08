@@ -19,12 +19,12 @@ import {
     XCircle,
     AlertCircle,
 } from 'lucide-react-native'
-import { buscarContrato, encerrarContrato } from '../../../src/services/contratoService'
-import { Contrato } from '../../../src/types'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import CentralModal from '../../../src/components/Modal/CentralModal'
-import BackButton from "../../../src/components/Header/BackButton";
+import { buscarContrato, encerrarContrato } from '@/src/services/contratoService'
+import { Contrato } from '@/src/types'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import BackButton from "@/src/components/Header/BackButton";
 
 function StatusBadge({ status }: { status: string }) {
     const config = {

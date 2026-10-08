@@ -6,10 +6,10 @@ import {
     Modal,
 } from 'react-native'
 import { router } from 'expo-router'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
-import { Icons } from '../../constants/icons'
-import { useAuthStore } from '../../store/authStore'
-import { logout } from '../../services/authService'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { Icons } from '@/src/constants/icons'
+import { useAuthStore } from '@/src/store/authStore'
+import { logout } from '@/src/services/authService'
 
 interface Props {
     visible: boolean

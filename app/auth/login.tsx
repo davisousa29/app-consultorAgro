@@ -11,15 +11,15 @@ import {
     ScrollView,
 } from 'react-native'
 import { router } from 'expo-router'
-import { login, loginComGoogle } from '../../src/services/authService'
-import { useAuthStore } from '../../src/store/authStore'
-import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import BackHeader from '../../src/components/Header/BackHeader'
-import CentralModal from '../../src/components/Modal/CentralModal'
-import PasswordInput from '../../src/components/Input/PasswordInput'
-import GoogleButton from '../../src/components/GoogleButton'
-import { useGoogleAuth } from '../../src/hooks/useGoogleAuth'
+import { login, loginComGoogle } from '@/src/services/authService'
+import { useAuthStore } from '@/src/store/authStore'
+import { Colors, FontSize, Spacing, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackHeader from '@/src/components/Header/BackHeader'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import PasswordInput from '@/src/components/Input/PasswordInput'
+import GoogleButton from '@/src/components/GoogleButton'
+import { useGoogleAuth } from '@/src/hooks/useGoogleAuth'
 
 const GOOGLE_LOGIN_HABILITADO = false
 

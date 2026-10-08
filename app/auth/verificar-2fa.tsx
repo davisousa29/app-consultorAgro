@@ -12,12 +12,12 @@ import {
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { Smartphone, Mail, KeyRound } from 'lucide-react-native'
-import { useAuthStore } from '../../src/store/authStore'
-import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import BackHeader from '../../src/components/Header/BackHeader'
-import CentralModal from '../../src/components/Modal/CentralModal'
-import { enviarCodigoEmail2fa, verificarLogin2fa } from '../../src/services/doisFatoresService'
+import { useAuthStore } from '@/src/store/authStore'
+import { Colors, FontSize, Spacing, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackHeader from '@/src/components/Header/BackHeader'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import { enviarCodigoEmail2fa, verificarLogin2fa } from '@/src/services/doisFatoresService'
 
 interface Metodo {
     chave: string

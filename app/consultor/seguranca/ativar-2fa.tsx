@@ -14,11 +14,11 @@ import { router } from 'expo-router'
 import QRCode from 'react-native-qrcode-svg'
 import * as Clipboard from 'expo-clipboard'
 import { Copy, Check } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import BackButton from '../../../src/components/Header/BackButton'
-import { gerar2fa, confirmar2fa } from '../../../src/services/doisFatoresService'
-import { toastSucesso, toastErro, toastInfo } from '../../../src/utils/toast'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackButton from '@/src/components/Header/BackButton'
+import { gerar2fa, confirmar2fa } from '@/src/services/doisFatoresService'
+import { toastSucesso, toastErro, toastInfo } from '@/src/utils/toast'
 
 export default function Ativar2fa() {
     const [loading, setLoading] = useState(true)

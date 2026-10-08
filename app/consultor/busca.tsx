@@ -12,12 +12,12 @@ import {
 } from 'react-native'
 import { router } from 'expo-router'
 import { Search, MapPin, ChevronRight } from 'lucide-react-native'
-import { buscarFazendeiros } from '../../src/services/buscaService'
-import BackButton from '../../src/components/Header/BackButton'
-import { FazendeiroPublico } from '../../src/types'
-import { Icons } from '../../src/constants/icons'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
+import { buscarFazendeiros } from '@/src/services/buscaService'
+import BackButton from '@/src/components/Header/BackButton'
+import { FazendeiroPublico } from '@/src/types'
+import { Icons } from '@/src/constants/icons'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
 
 const ESTADOS = [
     'Todos','AC','AL','AP','AM','BA','CE','DF','ES','GO','MA',
@@ -268,7 +268,7 @@ export default function BuscaScreen() {
                     ) : !buscou ? (
                         <View style={styles.vazio}>
                             <Image
-                                source={require('../../assets/png-files/chapeu_fazendeiro.png')}
+                                source={require('@/assets/png-files/chapeu_fazendeiro.png')}
                                 style={{ width: 100, height: 100 }}
                             />
                             <Text style={styles.vazioTexto}>Busque fazendeiros</Text>

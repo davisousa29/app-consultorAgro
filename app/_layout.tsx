@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import { useAuthStore } from '../src/store/authStore'
+import { useAuthStore } from '@/src/store/authStore'
 import Toast, { BaseToast, ErrorToast, InfoToast } from 'react-native-toast-message'
 
 export default function RootLayout() {

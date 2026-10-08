@@ -11,11 +11,11 @@ import {
     ScrollView,
 } from 'react-native'
 import { router } from 'expo-router'
-import { solicitarCodigoRecuperacao } from '../../src/services/authService'
-import { Colors, FontSize, Spacing } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import BackHeader from '../../src/components/Header/BackHeader'
-import CentralModal from '../../src/components/Modal/CentralModal'
+import { solicitarCodigoRecuperacao } from '@/src/services/authService'
+import { Colors, FontSize, Spacing } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackHeader from '@/src/components/Header/BackHeader'
+import CentralModal from '@/src/components/Modal/CentralModal'
 
 export default function RecuperarSenha() {
     const [email, setEmail] = useState('')

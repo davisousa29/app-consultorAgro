@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
-import { Colors, Spacing, FontSize } from '../../constants'
+import { Colors, Spacing, FontSize } from '@/src/constants'
 
 interface Props {
     senha: string

@@ -1,9 +1,9 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { router } from 'expo-router'
-import { Colors, FontSize, Spacing, BorderRadius } from '../../src/constants'
+import { Colors, FontSize, Spacing, BorderRadius } from '@/src/constants'
 
-import Logo from '../../src/components/Logo';
-import AuthBottomSheet from '../../src/components/AuthBottomSheet'
+import Logo from '@/src/components/Logo';
+import AuthBottomSheet from '@/src/components/AuthBottomSheet'
 
 export default function Welcome() {
     return (

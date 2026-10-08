@@ -1,5 +1,5 @@
 import { View, Image, StyleSheet } from 'react-native'
-import { Colors, BorderRadius } from '../constants'
+import { Colors, BorderRadius } from '@/src/constants'
 
 interface LogoProps {
     size?: number
@@ -9,7 +9,7 @@ export default function Logo({ size = 100 }: LogoProps) {
     return (
         <View style={[styles.container, { width: size, height: size, borderRadius: size * 0.24 }]}>
             <Image
-                source={require('../../assets/logo_AgroSystem_Consultor.png')}
+                source={require('@/assets/logo_AgroSystem_Consultor.png')}
                 style={{ width: size, height: size, borderRadius: size * 0.24 }}
             />
         </View>

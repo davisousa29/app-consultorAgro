@@ -11,11 +11,11 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { router } from 'expo-router'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { Colors, Spacing, FontSize } from '../../constants'
-import { Icons } from '../../constants/icons'
-import { useAuthStore } from '../../store/authStore'
-import { logout } from '../../services/authService'
-import { menuItems } from '../../constants/menuItems'
+import { Colors, Spacing, FontSize } from '@/src/constants'
+import { Icons } from '@/src/constants/icons'
+import { useAuthStore } from '@/src/store/authStore'
+import { logout } from '@/src/services/authService'
+import { menuItems } from '@/src/constants/menuItems'
 
 const MENU_WIDTH = Dimensions.get('window').width * 0.75
 

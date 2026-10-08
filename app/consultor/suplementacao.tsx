@@ -1,6 +1,6 @@
 import { View, Text } from 'react-native'
-import { globalStyles } from '../../src/constants/globalStyles'
-import { Colors, FontSize } from '../../src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { Colors, FontSize } from '@/src/constants'
 
 export default function SuplementacaoScreen() {
     return (

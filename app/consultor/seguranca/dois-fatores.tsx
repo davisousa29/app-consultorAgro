@@ -13,12 +13,12 @@ import {
 } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import { ShieldCheck, ShieldOff } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import BackButton from '../../../src/components/Header/BackButton'
-import PasswordInput from '../../../src/components/Input/PasswordInput'
-import { status2fa, desativar2fa } from '../../../src/services/doisFatoresService'
-import { toastSucesso, toastErro } from '../../../src/utils/toast'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackButton from '@/src/components/Header/BackButton'
+import PasswordInput from '@/src/components/Input/PasswordInput'
+import { status2fa, desativar2fa } from '@/src/services/doisFatoresService'
+import { toastSucesso, toastErro } from '@/src/utils/toast'
 
 export default function DoisFatores() {
     const [ativo, setAtivo] = useState(false)

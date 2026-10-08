@@ -1,14 +1,14 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { useEffect, useCallback, useState } from 'react'
 import { router, useFocusEffect } from 'expo-router'
-import { useNotificacaoStore } from '../../src/store/notificacaoStore'
-import { useAuthStore } from '../../src/store/authStore'
-import api from '../../src/services/api'
-import { Colors, FontSize, Spacing } from '../../src/constants'
-import { menuItems } from '../../src/constants/menuItems'
-import { getSubscriptionStatus, SubscriptionStatus } from '../../src/services/subscriptionService'
-import TrialBanner from '../../src/components/TrialBanner'
-import QuickShortcuts from '../../src/components/QuickShortcuts/QuickShortcuts'
+import { useNotificacaoStore } from '@/src/store/notificacaoStore'
+import { useAuthStore } from '@/src/store/authStore'
+import api from '@/src/services/api'
+import { Colors, FontSize, Spacing } from '@/src/constants'
+import { menuItems } from '@/src/constants/menuItems'
+import { getSubscriptionStatus, SubscriptionStatus } from '@/src/services/subscriptionService'
+import TrialBanner from '@/src/components/TrialBanner'
+import QuickShortcuts from '@/src/components/QuickShortcuts/QuickShortcuts'
 
 export default function Home() {
 
@@ -54,7 +54,7 @@ export default function Home() {
             <View style={styles.cardUserDescrible}>
 
                 <Image
-                    source={require('../../assets/png-files/box-initial.png')}
+                    source={require('@/assets/png-files/box-initial.png')}
                     style={styles.image}
                 />
 

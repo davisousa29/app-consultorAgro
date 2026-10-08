@@ -8,18 +8,18 @@ import {
     ActivityIndicator,
 } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import { Icons } from '../../src/constants/icons'
-import BackButton from '../../src/components/Header/BackButton'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { Icons } from '@/src/constants/icons'
+import BackButton from '@/src/components/Header/BackButton'
 import {
     listarNotificacoes,
     marcarLida,
     marcarTodasLidas,
     Notificacao,
-} from '../../src/services/notificacaoService'
-import { useNotificacaoStore } from '../../src/store/notificacaoStore'
-import { toastInfo, toastSucesso } from '../../src/utils/toast'
+} from '@/src/services/notificacaoService'
+import { useNotificacaoStore } from '@/src/store/notificacaoStore'
+import { toastInfo, toastSucesso } from '@/src/utils/toast'
 
 type Filtro = 'todas' | 'nao_lidas' | 'lidas'
 

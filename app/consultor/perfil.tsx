@@ -12,13 +12,13 @@ import {
     ScrollView,
 } from 'react-native'
 import { router } from 'expo-router'
-import { useAuthStore } from '../../src/store/authStore'
-import { globalStyles } from '../../src/constants/globalStyles'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import api from '../../src/services/api'
-import CentralModal from '../../src/components/Modal/CentralModal'
-import BackHeader from "../../src/components/Header/BackHeader";
-import { ESPECIALIZACOES, ESTADOS } from '../../src/constants/options'
+import { useAuthStore } from '@/src/store/authStore'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import api from '@/src/services/api'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import BackHeader from "@/src/components/Header/BackHeader";
+import { ESPECIALIZACOES, ESTADOS } from '@/src/constants/options'
 
 export default function Perfil() {
     const { user, setProfile } = useAuthStore()

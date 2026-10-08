@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native'
 import MaskInput from 'react-native-mask-input'
-import { globalStyles } from '../../constants/globalStyles'
-import { Colors } from '../../constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { Colors } from '@/src/constants'
 
 interface Props {
     label: string

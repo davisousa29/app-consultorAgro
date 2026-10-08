@@ -1,5 +1,5 @@
 import api from './api'
-import { FazendeiroPublico, PaginatedResponse } from '../types'
+import { FazendeiroPublico, PaginatedResponse } from '@/src/types'
 
 // ── Busca fazendeiros com filtros opcionais ───────────────────────────────────
 export async function buscarFazendeiros(filtros?: {

@@ -1,14 +1,14 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useState, useEffect } from 'react'
-import { useNotificacaoStore } from '../../store/notificacaoStore'
+import { useNotificacaoStore } from '@/src/store/notificacaoStore'
 import { router } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
-import { Icons } from '../../constants/icons'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { Icons } from '@/src/constants/icons'
 import NotificationDropdown from './NotificationDropdown'
-import { globalStyles } from '../../constants/globalStyles'
+import { globalStyles } from '@/src/constants/globalStyles'
 import ProfileDropdown from './ProfileDropdown'
-import SideMenu from '../Menu/SideMenu'
+import SideMenu from '@/src/components/Menu/SideMenu'
 
 export default function AppHeader() {
     const [dropdownVisible, setDropdownVisible] = useState(false)

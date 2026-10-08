@@ -1,5 +1,5 @@
 import api from './api'
-import { Contrato } from '../types'
+import { Contrato } from '@/src/types'
 
 // ── Lista contratos do consultor ──────────────────────────────────────────────
 export async function listarContratos(): Promise<Contrato[]> {

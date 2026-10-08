@@ -7,7 +7,7 @@ import {
     StyleSheet,
 } from 'react-native'
 import { X } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
 
 interface Props {
     visible: boolean

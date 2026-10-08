@@ -8,11 +8,11 @@ import {
     Alert,
 } from 'react-native'
 import { router } from 'expo-router'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import { menuItems } from '../../src/constants/menuItems'
-import { getShortcuts, saveShortcuts, MIN, MAX } from '../../src/services/shortcutsService'
-import BackHeader from '../../src/components/Header/BackHeader'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import { menuItems } from '@/src/constants/menuItems'
+import { getShortcuts, saveShortcuts, MIN, MAX } from '@/src/services/shortcutsService'
+import BackHeader from '@/src/components/Header/BackHeader'
 
 export default function EditarShortcuts() {
     const [selecionados, setSelecionados] = useState<string[]>([])

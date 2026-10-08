@@ -12,15 +12,15 @@ import {
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { ChevronDown } from 'lucide-react-native'
-import { buscarPerfilFazendeiro } from '../../src/services/buscaService'
-import { proporContrato } from '../../src/services/contratoService'
-import { FazendeiroPublico } from '../../src/types'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../src/constants'
-import { globalStyles } from '../../src/constants/globalStyles'
-import DateInput from '../../src/components/Input/DateInput'
-import CurrencyInput, { parseCurrency } from '../../src/components/Input/CurrencyInput'
-import CentralModal from '../../src/components/Modal/CentralModal'
-import BackButton from "../../src/components/Header/BackButton";
+import { buscarPerfilFazendeiro } from '@/src/services/buscaService'
+import { proporContrato } from '@/src/services/contratoService'
+import { FazendeiroPublico } from '@/src/types'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import DateInput from '@/src/components/Input/DateInput'
+import CurrencyInput, { parseCurrency } from '@/src/components/Input/CurrencyInput'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import BackButton from "@/src/components/Header/BackButton";
 
 
 

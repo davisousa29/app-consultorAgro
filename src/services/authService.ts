@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from './api'
-import { AuthResponse, User } from '../types'
+import { AuthResponse, User } from '@/src/types'
 
 // ── Registro ──────────────────────────────────────────────────────────────────
 export async function register(data: {

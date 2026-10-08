@@ -9,15 +9,15 @@ import {
 } from 'react-native'
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router'
 import { FileText, TrendingUp } from 'lucide-react-native'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import BackButton from '../../../src/components/Header/BackButton'
-import CentralModal from '../../../src/components/Modal/CentralModal'
-import api from '../../../src/services/api'
-import { Icons } from '../../../src/constants/icons'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackButton from '@/src/components/Header/BackButton'
+import CentralModal from '@/src/components/Modal/CentralModal'
+import api from '@/src/services/api'
+import { Icons } from '@/src/constants/icons'
 import * as Print from 'expo-print'
 import * as Sharing from 'expo-sharing'
-import { toastErro, toastInfo, toastSucesso } from '../../../src/utils/toast'
+import { toastErro, toastInfo, toastSucesso } from '@/src/utils/toast'
 
 const MODALIDADE_LABEL: Record<string, string> = {
     arroba: 'Arroba (@)',

@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { router } from 'expo-router'
-import { useAuthStore } from '../src/store/authStore'
-import { Colors } from '../src/constants'
+import { useAuthStore } from '@/src/store/authStore'
+import { Colors } from '@/src/constants'
 
 export default function Index() {
     const { isLoggedIn, isLoading } = useAuthStore()

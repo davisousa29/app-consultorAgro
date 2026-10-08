@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Colors } from '../../src/constants'
+import { Colors } from '@/src/constants'
 
 
 export default function AssinaturaLayout() {

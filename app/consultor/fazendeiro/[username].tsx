@@ -11,11 +11,11 @@ import {
 } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { MapPin, Phone, MessageCircle, FileText } from 'lucide-react-native'
-import { buscarPerfilFazendeiro } from '../../../src/services/buscaService'
-import { FazendeiroPublico } from '../../../src/types'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../../src/constants'
-import { globalStyles } from '../../../src/constants/globalStyles'
-import BackButton from "../../../src/components/Header/BackButton";
+import { buscarPerfilFazendeiro } from '@/src/services/buscaService'
+import { FazendeiroPublico } from '@/src/types'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
+import BackButton from "@/src/components/Header/BackButton";
 
 export default function PerfilFazendeiroScreen() {
     const { username } = useLocalSearchParams<{ username: string }>()

@@ -8,9 +8,9 @@ import {
     Dimensions,
 } from 'react-native'
 import { router } from 'expo-router'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
-import { menuItems } from '../../constants/menuItems'
-import { getShortcuts } from '../../services/shortcutsService'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { menuItems } from '@/src/constants/menuItems'
+import { getShortcuts } from '@/src/services/shortcutsService'
 
 const { width } = Dimensions.get('window')
 const PADDING = Spacing.lg * 2

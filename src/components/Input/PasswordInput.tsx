@@ -7,9 +7,9 @@ import {
     StyleSheet,
     TextInputProps,
 } from 'react-native'
-import { Icons } from '../../constants/icons'
-import { Colors, Spacing, FontSize, BorderRadius } from '../../constants'
-import { globalStyles } from '../../constants/globalStyles'
+import { Icons } from '@/src/constants/icons'
+import { Colors, Spacing, FontSize, BorderRadius } from '@/src/constants'
+import { globalStyles } from '@/src/constants/globalStyles'
 
 interface Props extends Omit<TextInputProps, 'secureTextEntry'> {
     label?: string

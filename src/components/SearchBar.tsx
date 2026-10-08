@@ -1,6 +1,6 @@
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
 import { Search, X } from 'lucide-react-native'
-import { Colors, Spacing, BorderRadius, FontSize } from '../constants'
+import { Colors, Spacing, BorderRadius, FontSize } from '@/src/constants'
 
 interface Props {
     value: string
