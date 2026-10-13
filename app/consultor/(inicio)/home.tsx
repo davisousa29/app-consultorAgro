@@ -1,11 +1,10 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native'
 import { useEffect, useCallback, useState } from 'react'
-import { router, useFocusEffect } from 'expo-router'
+import { useFocusEffect } from 'expo-router'
 import { useNotificacaoStore } from '@/src/store/notificacaoStore'
 import { useAuthStore } from '@/src/store/authStore'
 import api from '@/src/services/api'
-import { Colors, FontSize, Spacing } from '@/src/constants'
-import { menuItems } from '@/src/constants/menuItems'
+import { Colors, Spacing } from '@/src/constants'
 import { getSubscriptionStatus, SubscriptionStatus } from '@/src/services/subscriptionService'
 import SubscriptionBanner from '@/src/components/Subscription/SubscriptionBanner'
 import QuickShortcuts from '@/src/components/QuickShortcuts/QuickShortcuts'
@@ -48,7 +47,11 @@ export default function Home() {
     }, [user])
 
     return (
-        <View style={styles.container}>
+        <ScrollView
+            style={styles.screen}
+            contentContainerStyle={styles.content}
+            showsVerticalScrollIndicator={false}
+        >
             <SubscriptionBanner subscription={subscription} />
 
             <View style={styles.cardUserDescrible}>
@@ -58,7 +61,7 @@ export default function Home() {
                     style={styles.image}
                 />
 
-                <View style={styles.content}>
+                <View style={styles.cardContent}>
                     <View style={styles.badge}>
                         <Text style={styles.badgeText}>Especialista em {profile?.specialization}</Text>
                     </View>
@@ -76,15 +79,20 @@ export default function Home() {
             </View>
 
             <QuickShortcuts />
-        </View>
+        </ScrollView>
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
+    screen: {
         flex: 1,
         backgroundColor: Colors.background,
+    },
+
+    // Padding dentro da rolagem; o espaço extra embaixo evita que o último atalho cole na borda
+    content: {
         padding: Spacing.lg,
+        paddingBottom: Spacing.xxl,
     },
 
     cardUserDescrible: {
@@ -95,43 +103,13 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
 
-    cardQuickShortcuts: {
-        width: '100%',
-        height: 260,
-        marginTop: 20,
-    },
-
-    subCardQuickShortcuts: {
-        width: '100%',
-        height: '100%',
-        justifyContent: "space-between",
-        flexDirection: "row",
-        gap: 5,
-    },
-
-    ItemShortcuts: {
-        width: '48%',
-        height: 80,
-        borderRadius: 12,
-        backgroundColor: Colors.primary,
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 6,
-    },
-
-    shortcutText: {
-        color: Colors.white,
-        fontSize: 12,
-        textAlign: 'center',
-    },
-
     image: {
         width: '100%',
         height: '100%',
         position: 'absolute',
     },
 
-    content: {
+    cardContent: {
         flex: 1,
         padding: 20,
         justifyContent: 'flex-end',

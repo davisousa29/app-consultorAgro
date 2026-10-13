@@ -16,32 +16,11 @@ import {
     Notificacao,
 } from '@/src/services/notificacaoService'
 import { useNotificacaoStore } from '@/src/store/notificacaoStore'
+import { configDoTipo, tempoRelativo, abrirDestino } from '@/src/utils/notificacoes'
 
 interface Props {
     visible: boolean
     onClose: () => void
-}
-
-// Mapa de ícone e cor por tipo de notificação
-const TIPO_CONFIG: Record<string, { icone: any; cor: string }> = {
-    contrato_aceito:    { icone: Icons.handShake,  cor: '#40C057' },
-    contrato_recusado:  { icone: Icons.circleAlert, cor: '#FA5252' },
-    contrato_encerrado: { icone: Icons.contract,   cor: '#6C757D' },
-}
-
-function tempoRelativo(data: string): string {
-    const agora = new Date()
-    const then = new Date(data)
-    const diffMs = agora.getTime() - then.getTime()
-    const diffMin = Math.floor(diffMs / 60000)
-
-    if (diffMin < 1) return 'agora'
-    if (diffMin < 60) return `${diffMin}min`
-    const diffH = Math.floor(diffMin / 60)
-    if (diffH < 24) return `${diffH}h`
-    const diffD = Math.floor(diffH / 24)
-    if (diffD < 30) return `${diffD}d`
-    return then.toLocaleDateString('pt-BR')
 }
 
 export default function NotificationDropdown({ visible, onClose }: Props) {
@@ -81,9 +60,7 @@ export default function NotificationDropdown({ visible, onClose }: Props) {
         }
 
         // Navega para o recurso, se houver
-        if (notif.dados?.rota === 'contrato' && notif.dados.id) {
-            router.push(`/consultor/contrato/${notif.dados.id}` as any)
-        }
+        abrirDestino(notif)
     }
 
     function verTodas() {
@@ -128,7 +105,7 @@ export default function NotificationDropdown({ visible, onClose }: Props) {
                         </View>
                     ) : (
                         notificacoes.map((notif, index) => {
-                            const config = TIPO_CONFIG[notif.tipo] ?? { icone: Icons.bell, cor: Colors.gray[500] }
+                            const config = configDoTipo(notif.tipo)
                             const Icone = config.icone
                             return (
                                 <View key={notif.id}>

@@ -20,33 +20,15 @@ import {
 } from '@/src/services/notificacaoService'
 import { useNotificacaoStore } from '@/src/store/notificacaoStore'
 import { toastInfo, toastSucesso } from '@/src/utils/toast'
+import { configDoTipo, tempoRelativo, abrirDestino } from '@/src/utils/notificacoes'
 
 type Filtro = 'todas' | 'nao_lidas' | 'lidas'
-
-const TIPO_CONFIG: Record<string, { icone: any; cor: string }> = {
-    contrato_aceito:    { icone: Icons.handShake,   cor: '#40C057' },
-    contrato_recusado:  { icone: Icons.circleAlert, cor: '#FA5252' },
-    contrato_encerrado: { icone: Icons.contract,    cor: '#6C757D' },
-}
 
 const FILTRO_CHIPS: { label: string; value: Filtro }[] = [
     { label: 'Todas',     value: 'todas' },
     { label: 'Não lidas', value: 'nao_lidas' },
     { label: 'Lidas',     value: 'lidas' },
 ]
-
-function tempoRelativo(data: string): string {
-    const agora = new Date()
-    const then = new Date(data)
-    const diffMin = Math.floor((agora.getTime() - then.getTime()) / 60000)
-    if (diffMin < 1) return 'agora'
-    if (diffMin < 60) return `${diffMin}min`
-    const diffH = Math.floor(diffMin / 60)
-    if (diffH < 24) return `${diffH}h`
-    const diffD = Math.floor(diffH / 24)
-    if (diffD < 30) return `${diffD}d`
-    return then.toLocaleDateString('pt-BR')
-}
 
 export default function NotificacoesScreen() {
     const [notificacoes, setNotificacoes] = useState<Notificacao[]>([])
@@ -104,9 +86,7 @@ export default function NotificacoesScreen() {
             }
         }
 
-        if (notif.dados?.rota === 'contrato' && notif.dados.id) {
-            router.push(`/consultor/contrato/${notif.dados.id}` as any)
-        } else {
+        if (!abrirDestino(notif)) {
             toastInfo('Este item não está mais disponível.')
         }
     }
@@ -123,7 +103,7 @@ export default function NotificacoesScreen() {
     }
 
     function renderNotificacao({ item }: { item: Notificacao }) {
-        const config = TIPO_CONFIG[item.tipo] ?? { icone: Icons.bell, cor: Colors.gray[500] }
+        const config = configDoTipo(item.tipo)
         const Icone = config.icone
         return (
             <TouchableOpacity
