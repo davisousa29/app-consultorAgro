@@ -1,6 +1,9 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import api from './api'
+import { useAuthStore } from '@/src/store/authStore'
 import { AuthResponse, User } from '@/src/types'
+
+// A sessão (token, usuário) é gravada só pelo authStore.
+// Este arquivo apenas conversa com a API.
 
 // ── Registro ──────────────────────────────────────────────────────────────────
 export async function register(data: {
@@ -17,19 +20,12 @@ export async function register(data: {
         ...data,
         role: 'consultor',
     })
-    await salvarSessao(response.data)
     return response.data
 }
 
 // ── Login ─────────────────────────────────────────────────────────────────────
 export async function login(email: string, password: string): Promise<any> {
     const response = await api.post<any>('/auth/login', { email, password })
-
-    if (response.data.requer_2fa) {
-        return response.data
-    }
-
-    await salvarSessao(response.data)
     return response.data
 }
 
@@ -38,11 +34,12 @@ export async function logout(): Promise<void> {
     try {
         await api.post('/auth/logout')
     } catch {
-        // Ignora erro do servidor (ex: token já invalido) — o importante é limpar a sessão local
+        // Ignora erro do servidor (ex: token já inválido) — o importante é limpar a sessão local
     } finally {
-        await limparSessao()
+        await useAuthStore.getState().clearUser()
     }
 }
+
 // ── Usuário autenticado ───────────────────────────────────────────────────────
 export async function me(): Promise<User> {
     const response = await api.get<{ user: User }>('/auth/me')
@@ -65,31 +62,10 @@ export async function redefinirSenha(data: {
     return response.data
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-async function salvarSessao(data: AuthResponse): Promise<void> {
-    await AsyncStorage.setItem('@agro:token', data.token)
-    await AsyncStorage.setItem('@agro:user', JSON.stringify(data.user))
-}
-
-async function limparSessao(): Promise<void> {
-    await AsyncStorage.removeItem('@agro:token')
-    await AsyncStorage.removeItem('@agro:user')
-}
-
-export async function getUsuarioLocal(): Promise<User | null> {
-    const user = await AsyncStorage.getItem('@agro:user')
-    return user ? JSON.parse(user) : null
-}
-
-export async function getTokenLocal(): Promise<string | null> {
-    return AsyncStorage.getItem('@agro:token')
-}
-
 // ── Login com Google ──────────────────────────────────────────────────────────
 export async function loginComGoogle(accessToken: string): Promise<AuthResponse & { cadastro_completo: boolean }> {
     const response = await api.post<AuthResponse & { cadastro_completo: boolean }>('/auth/google', {
         access_token: accessToken,
     })
-    await salvarSessao(response.data)
     return response.data
 }

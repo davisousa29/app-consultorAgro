@@ -3,6 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { User } from '@/src/types'
 import { Profile } from '@/src/types'
 
+const KEYS = {
+    user: '@agro:user',
+    token: '@agro:token',
+    profile: '@agro:profile',
+} as const
+
 // ── Formato do store ──────────────────────────────────────────────────────────
 interface AuthState {
     user: User | null
@@ -14,11 +20,12 @@ interface AuthState {
     // Ações
     setUser: (user: User, token: string) => Promise<void>
     setProfile: (profile: Profile) => Promise<void>
-    clearUser: () => void
+    clearUser: () => Promise<void>
     loadFromStorage: () => Promise<void>
 }
 
 // ── Store ─────────────────────────────────────────────────────────────────────
+// Único dono da sessão: memória (para o app) + AsyncStorage (para reabrir o app).
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,
     token: null,
@@ -27,49 +34,48 @@ export const useAuthStore = create<AuthState>((set) => ({
     isLoading: true,
 
     setUser: async (user, token) => {
-        await AsyncStorage.setItem('@agro:user', JSON.stringify(user))
-        await AsyncStorage.setItem('@agro:token', token)
-
+        // Memória primeiro: a próxima requisição já sai com o token novo,
+        // mesmo que a tela navegue antes de o storage terminar de gravar
         set({ user, token, isLoggedIn: true, isLoading: false })
+
+        await AsyncStorage.multiSet([
+            [KEYS.user, JSON.stringify(user)],
+            [KEYS.token, token],
+        ])
     },
 
     setProfile: async (profile) => {
-        await AsyncStorage.setItem('@agro:profile', JSON.stringify(profile))
         set({ profile })
+        await AsyncStorage.setItem(KEYS.profile, JSON.stringify(profile))
     },
 
     clearUser: async () => {
-        await AsyncStorage.multiRemove([
-            '@agro:user',
-            '@agro:token',
-            '@agro:profile',
-        ])
-
         set({
             user: null,
             token: null,
             profile: null,
             isLoggedIn: false,
-            isLoading: false
+            isLoading: false,
         })
+
+        await AsyncStorage.multiRemove([KEYS.user, KEYS.token, KEYS.profile])
     },
 
     loadFromStorage: async () => {
         try {
-            const token = await AsyncStorage.getItem('@agro:token')
-            const userJson = await AsyncStorage.getItem('@agro:user')
-            const profileJson = await AsyncStorage.getItem('@agro:profile')
+            const [[, token], [, userJson], [, profileJson]] = await AsyncStorage.multiGet([
+                KEYS.token,
+                KEYS.user,
+                KEYS.profile,
+            ])
 
             if (token && userJson) {
-                const user = JSON.parse(userJson) as User
-                const profile = profileJson ? JSON.parse(profileJson) : null
-
                 set({
-                    user,
+                    user: JSON.parse(userJson) as User,
                     token,
-                    profile,
+                    profile: profileJson ? JSON.parse(profileJson) : null,
                     isLoggedIn: true,
-                    isLoading: false
+                    isLoading: false,
                 })
             } else {
                 set({ isLoading: false })
