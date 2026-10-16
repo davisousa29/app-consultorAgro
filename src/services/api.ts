@@ -1,9 +1,39 @@
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import Constants from 'expo-constants'
+
+/**
+ * Endereço da API, nesta ordem:
+ * 1. EXPO_PUBLIC_API_URL, quando definida (produção, ou para forçar um endereço em dev);
+ * 2. em desenvolvimento, o IP do computador que roda o `npx expo start`, na porta 80 —
+ *    a URL acompanha a rede sem editar código;
+ * 3. sem nenhum dos dois, falha ao abrir, em vez de chamar um endereço errado.
+ */
+function resolveApiUrl(): string {
+    const fromEnv = process.env.EXPO_PUBLIC_API_URL
+    if (fromEnv) {
+        return fromEnv.replace(/\/$/, '') // sem barra no final
+    }
+
+    if (__DEV__) {
+        // hostUri = "192.168.1.51:8081" → só o IP
+        const host = Constants.expoConfig?.hostUri?.split(':')[0]
+        if (host) {
+            return `http://${host}/api`
+        }
+    }
+
+    throw new Error('EXPO_PUBLIC_API_URL não está definida para este build.')
+}
+
+const baseURL = resolveApiUrl()
+
+if (__DEV__) {
+    console.log(`[api] ${baseURL}`)
+}
 
 const api = axios.create({
-    // baseURL: 'http://localhost/api',
-    baseURL: 'http://192.168.1.64/api',
+    baseURL,
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
